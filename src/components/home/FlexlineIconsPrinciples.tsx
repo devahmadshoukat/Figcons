@@ -3,7 +3,7 @@ import Image from "next/image";
 export const FlexlineIconsPrinciples1 = () => {
     return (
         <div className="w-[100%] flex md:flex-row flex-col gap-[32px] md:gap-[0px] ">
-            <div className="w-[100%] md:w-[30%] px-[24px] md:px-[80px] pt-[32px] md:pt-[64px] border-r border-[#454545]">
+            <div className="w-[100%] md:w-[30%] px-[24px] md:px-[80px] pt-[32px] md:pt-[64px] md:border-r border-[#454545]">
                 <div className="w-[100%] md:w-[190px] flex flex-col gap-[12px]">
                     <h1 className="text-[30px] text-[#ffffff] font-bold leading-[40px]">Unmatched Consistency</h1>
                     <p className="text-[#b7b7b7] text-[16px] font-normal leading-[24px]">Strict construction principles ensure every icon looks like part of one family—so your design system stays flawless.</p>
@@ -45,7 +45,7 @@ export const FlexlineIconsPrinciples2 = () => {
 export const FlexlineIconsPrinciples3 = () => {
     return (
         <div className="w-[100%] flex md:flex-row flex-col gap-[32px] md:gap-[0px]">
-            <div className="w-[100%] md:w-[30%] px-[24px] md:px-[80px] pt-[32px] md:pt-[64px] border-r border-[#454545]">
+            <div className="w-[100%] md:w-[30%] px-[24px] md:px-[80px] pt-[32px] md:pt-[64px] md:border-r border-[#454545]">
                 <div className="w-[100%] md:w-[190px] flex flex-col gap-[12px]">
                     <h1 className="text-[30px] text-[#ffffff] font-bold leading-[40px]">Unmatched Consistency</h1>
                     <p className="text-[#b7b7b7] text-[16px] font-normal leading-[24px]">Strict construction principles ensure every icon looks like part of one family—so your design system stays flawless.</p>

@@ -1,9 +1,11 @@
 import { GridBox } from "@/commons/GridBox";
 import Appbar from "@/components/Appbar";
+import BuildIcon, { BuildIconTitle } from "@/components/home/BuildIcon";
+import { FlexlineIconsPrinciples1, FlexlineIconsPrinciples2, FlexlineIconsPrinciples3 } from "@/components/home/FlexlineIconsPrinciples";
 import Hero from "@/components/home/Hero";
 import IconGallery from "@/components/home/IconGallery";
 import IconShowcase from "@/components/home/IconShowcase";
-import { FlexlineIconsPrinciples1, FlexlineIconsPrinciples2, FlexlineIconsPrinciples3 } from "@/components/home/FlexlineIconsPrinciples";
+import Plugin from "@/components/home/Plugin";
 import TestimonialStats from "@/components/home/TestimonialStats";
 import Total from "@/components/home/Total";
 
@@ -19,6 +21,8 @@ export default function HomePage() {
                 classNameChild6={true}
                 classNameChild7={true}
                 classNameChild8={true}
+                classNameChild9="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
+                classNameChild11="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
             >
                 <Hero />
                 <IconGallery />
@@ -28,6 +32,9 @@ export default function HomePage() {
                 <FlexlineIconsPrinciples1 />
                 <FlexlineIconsPrinciples2 />
                 <FlexlineIconsPrinciples3 />
+                <BuildIconTitle />
+                <BuildIcon />
+                <Plugin />
             </GridBox>
         </div>
     )

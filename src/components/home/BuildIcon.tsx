@@ -1,10 +1,43 @@
 "use client";
 import Svg from "@/commons/Svg";
 import useMediaQuery from "@/commons/UseMediaQuery";
+import { useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 export const BuildIconTitle = () => {
+    const titleRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!titleRef.current) return;
+
+        const tl = gsap.fromTo(titleRef.current,
+            { opacity: 0, y: 30 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: titleRef.current,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none none",
+                    once: true,
+                }
+            }
+        );
+
+        // Cleanup function
+        return () => {
+            tl.kill();
+        };
+    }, []);
     return (
-        <div className="w-[100%] flex flex-col gap-[12px] items-center justify-center">
+        <div ref={titleRef} className="w-[100%] flex flex-col gap-[12px] items-center justify-center">
             <h1 className="text-[#0e0e0e] text-[24px] md:text-[30px] font-bold leading-[40px]">BuildIcon</h1>
             <p className="text-[#454545] text-[14px] md:text-[16px] font-normal leading-[24px]">Export and integrate in seconds.</p>
         </div>
@@ -13,6 +46,43 @@ export const BuildIconTitle = () => {
 
 export default function BuildIcon() {
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const buildIconRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!buildIconRef.current) return;
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: buildIconRef.current,
+                start: "top 85%",
+                end: "bottom 15%",
+                toggleActions: "play none none none",
+                once: true,
+                fastScrollEnd: true,
+                refreshPriority: -1,
+            }
+        });
+
+        // Animate feature cards with stagger
+        tl.fromTo(buildIconRef.current?.children,
+            { opacity: 0, y: 20, scale: 0.98 },
+            { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1, 
+                duration: 0.6, 
+                ease: "power2.out",
+                stagger: 0.06
+            }
+        );
+
+        // Cleanup function
+        return () => {
+            tl.kill();
+        };
+
+    }, []);
+
     const features = [
         { icon: "paint" as const, text: "Recolor entire icons sets", hasBgDesktop: false, hasBgMobile: false },
         { icon: "resize" as const, text: "Resize vectors, with perfect quality", hasBgDesktop: true, hasBgMobile: true },
@@ -29,7 +99,7 @@ export default function BuildIcon() {
     ];
 
     return (
-        <div className="w-full grid md:grid-cols-4 grid-cols-2">
+        <div ref={buildIconRef} className="w-full grid md:grid-cols-4 grid-cols-2">
             {features.map((feature, index) => (
                 <div
                     key={index}

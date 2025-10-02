@@ -1,4 +1,11 @@
-import React from 'react';
+"use client"
+
+import React, { useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger); 
 
 // Constants
 const CLASSES = {
@@ -26,8 +33,56 @@ export const GridBox = ({
   darkSections = [],
   ...props
 }: GridBoxProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const childrenArray = React.Children.toArray(children);
   const hasMultipleChildren = childrenArray.length > 1;
+
+  // Initialize section refs array
+  useEffect(() => {
+    sectionRefs.current = sectionRefs.current.slice(0, childrenArray.length);
+  }, [childrenArray.length]);
+
+  // Set up GSAP animations for inner content only
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const sections = sectionRefs.current.filter(Boolean);
+    
+    // Create scroll-triggered animations for inner content only
+    sections.forEach((section, index) => {
+      if (!section) return;
+
+      const innerContent = section.querySelector('.inner-content');
+      if (!innerContent) return;
+
+      // Set initial state for inner content
+      gsap.set(innerContent, {
+        opacity: 0,
+      });
+
+      gsap.to(innerContent, {
+        opacity: 1,
+        duration: 1.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 90%",
+          end: "bottom 10%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    });
+
+    // Cleanup function
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.trigger && sections.includes(trigger.trigger as HTMLDivElement)) {
+          trigger.kill();
+        }
+      });
+    };
+  }, [childrenArray.length]);
 
   const getChildProps = (index: number) => {
     const childProp = props[`classNameChild${index + 1}` as keyof typeof props];
@@ -124,7 +179,7 @@ export const GridBox = ({
   );
 
   return (
-    <div className={CLASSES.CONTAINER}>
+    <div ref={containerRef} className={CLASSES.CONTAINER}>
       {React.Children.map(children, (child, index) => {
         const isLastChild = index === childrenArray.length - 1;
         const shouldAddBorder = hasMultipleChildren && !isLastChild;
@@ -132,12 +187,18 @@ export const GridBox = ({
         const styles = getSectionStyles(index);
 
         return (
-          <div key={index} className={styles.bgColor}>
+          <div 
+            key={index} 
+            ref={(el) => {
+              sectionRefs.current[index] = el;
+            }}
+            className={styles.bgColor}
+          >
             {shouldAddTopDivider(index) && renderSectionDivider()}
 
             <div className={CLASSES.CONTENT_WRAPPER}>
               <div className={`${CLASSES.INNER_WRAPPER} ${styles.borderColor} ${classNameParent}`}>
-                <div className={`${styles.childClassName} ${styles.textColor}`}>
+                <div className={`inner-content ${styles.childClassName} ${styles.textColor}`}>
                   {child}
                 </div>
               </div>

@@ -47,18 +47,20 @@ export default function Hero() {
         );
 
         // Animate stats with stagger
-        tl.fromTo(statsRef.current?.children,
-            { opacity: 0, y: 40, scale: 0.9 },
-            { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1, 
-                duration: 0.6, 
-                ease: "power2.out",
-                stagger: 0.1
-            },
-            "-=0.4"
-        );
+        if (statsRef.current?.children) {
+            tl.fromTo(statsRef.current.children,
+                { opacity: 0, y: 40, scale: 0.9 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1, 
+                    duration: 0.6, 
+                    ease: "power2.out",
+                    stagger: 0.1
+                },
+                "-=0.4"
+            );
+        }
 
     }, []);
 

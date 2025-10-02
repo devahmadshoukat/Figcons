@@ -151,7 +151,7 @@ export default function Footer() {
                     <h1 className="text-lg md:text-2xl font-bold leading-8 text-[#0e0e0e] hover:text-[#b7b7b7] transition-colors duration-300">Resources</h1>
                     <div className="flex flex-col gap-3 md:gap-4">
                         <p className="text-sm md:text-base font-normal leading-6 text-[#0e0e0e] hover:text-[#b7b7b7] transition-colors duration-300 cursor-pointer break-words">UI8 Shop</p>
-                        <p className="text-sm md:text-base font-normal leading-6 text-[#0e0e0e] hover:text-[#b7b7b7] transition-colors duration-300 cursor-pointer break-words">FAQ's</p>
+                        <p className="text-sm md:text-base font-normal leading-6 text-[#0e0e0e] hover:text-[#b7b7b7] transition-colors duration-300 cursor-pointer break-words">FAQ&apos;s</p>
                         <p className="text-sm md:text-base font-normal leading-6 text-[#0e0e0e] hover:text-[#b7b7b7] transition-colors duration-300 cursor-pointer break-words">Blog</p>
                     </div>
                 </div>

@@ -31,18 +31,20 @@ export default function IconShowcase() {
         );
 
         // Animate cards with stagger and scale effect
-        tl.fromTo(cardsRef.current?.children,
-            { opacity: 0, y: 50, scale: 0.8 },
-            { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1, 
-                duration: 0.7, 
-                ease: "power2.out",
-                stagger: 0.15
-            },
-            "-=0.4"
-        );
+        if (cardsRef.current?.children) {
+            tl.fromTo(cardsRef.current.children,
+                { opacity: 0, y: 50, scale: 0.8 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1, 
+                    duration: 0.7, 
+                    ease: "power2.out",
+                    stagger: 0.15
+                },
+                "-=0.4"
+            );
+        }
 
     }, []);
     const Cards = [

@@ -48,7 +48,7 @@ export default function Total() {
                     snap: { textContent: 1 },
                     delay: index * 0.3,
                     onUpdate: function() {
-                        number.textContent = Math.ceil(this.targets()[0].textContent);
+                        number.textContent = Math.ceil(Number(this.targets()[0].textContent)).toString();
                     }
                 }
             );

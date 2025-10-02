@@ -41,18 +41,20 @@ export default function IconGallery() {
         );
 
         // Animate buttons with stagger
-        tl.fromTo(buttonsRef.current?.children,
-            { opacity: 0, y: 20, scale: 0.9 },
-            { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1, 
-                duration: 0.5, 
-                ease: "power2.out",
-                stagger: 0.1
-            },
-            "-=0.3"
-        );
+        if (buttonsRef.current?.children) {
+            tl.fromTo(buttonsRef.current.children,
+                { opacity: 0, y: 20, scale: 0.9 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1, 
+                    duration: 0.5, 
+                    ease: "power2.out",
+                    stagger: 0.1
+                },
+                "-=0.3"
+            );
+        }
 
         // Animate arrow with rotation
         tl.fromTo(arrowRef.current,

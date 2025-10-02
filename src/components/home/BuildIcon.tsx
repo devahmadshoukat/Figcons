@@ -14,22 +14,44 @@ export const BuildIconTitle = () => {
     useEffect(() => {
         if (!titleRef.current) return;
 
-        const tl = gsap.fromTo(titleRef.current,
-            { opacity: 0, y: 30 },
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: titleRef.current,
+                start: "top 85%",
+                end: "bottom 15%",
+                toggleActions: "play none none none",
+                once: true,
+                fastScrollEnd: true,
+            }
+        });
+
+        // Animate title with smooth entrance
+        tl.fromTo(titleRef.current,
+            { 
+                opacity: 0, 
+                y: 40,
+                scale: 0.95
+            },
             {
                 opacity: 1,
                 y: 0,
-                duration: 0.8,
+                scale: 1,
+                duration: 1.2,
                 ease: "power3.out",
-                scrollTrigger: {
-                    trigger: titleRef.current,
-                    start: "top 80%",
-                    end: "bottom 20%",
-                    toggleActions: "play none none none",
-                    once: true,
-                }
             }
         );
+
+        // Add subtle bounce effect to the title
+        tl.to(titleRef.current, {
+            scale: 1.02,
+            duration: 0.3,
+            ease: "power2.out",
+        }, "-=0.2")
+        .to(titleRef.current, {
+            scale: 1,
+            duration: 0.4,
+            ease: "elastic.out(1, 0.5)",
+        });
 
         // Cleanup function
         return () => {
@@ -63,18 +85,47 @@ export default function BuildIcon() {
             }
         });
 
-        // Animate feature cards with stagger
+        // Animate feature cards with enhanced stagger and smooth effects
         tl.fromTo(buildIconRef.current?.children,
-            { opacity: 0, y: 20, scale: 0.98 },
+            { 
+                opacity: 0, 
+                y: 30, 
+                scale: 0.9,
+                rotationX: 15
+            },
             { 
                 opacity: 1, 
                 y: 0, 
-                scale: 1, 
-                duration: 0.6, 
-                ease: "power2.out",
-                stagger: 0.06
+                scale: 1,
+                rotationX: 0,
+                duration: 0.8, 
+                ease: "power3.out",
+                stagger: {
+                    amount: 0.3,
+                    from: "start"
+                }
             }
         );
+
+        // Add subtle hover-like effect to each card
+        tl.to(buildIconRef.current?.children, {
+            scale: 1.02,
+            duration: 0.2,
+            ease: "power2.out",
+            stagger: {
+                amount: 0.1,
+                from: "start"
+            }
+        }, "-=0.4")
+        .to(buildIconRef.current?.children, {
+            scale: 1,
+            duration: 0.3,
+            ease: "elastic.out(1, 0.3)",
+            stagger: {
+                amount: 0.1,
+                from: "start"
+            }
+        });
 
         // Cleanup function
         return () => {
@@ -103,10 +154,10 @@ export default function BuildIcon() {
             {features.map((feature, index) => (
                 <div
                     key={index}
-                    className={`flex flex-col gap-[16px] items-center justify-center py-[32px] md:py-[70px] px-[20px] md:px-[45px] ${isMobile ? (feature.hasBgMobile && 'bg-[#f6f6f6]') : (feature.hasBgDesktop && 'bg-[#f6f6f6]')}`}
+                    className={`flex flex-col gap-[16px] items-center justify-center py-[32px] md:py-[70px] px-[20px] md:px-[45px] transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg ${isMobile ? (feature.hasBgMobile && 'bg-[#f6f6f6]') : (feature.hasBgDesktop && 'bg-[#f6f6f6]')}`}
                 >
                     <div className="h-[155px] md:h-[210px] flex flex-col justify-center items-center md:gap-[56px] gap-[27px] text-center">
-                        <Svg className="w-[64px] md:w-[80px]" icon={feature.icon} />
+                        <Svg className="w-[64px] md:w-[80px] transition-transform duration-300 ease-out hover:scale-110" icon={feature.icon} />
                         <p className="text-[#0e0e0e] w-[90%] md:w-auto text-[12px] md:text-[16px] font-normal leading-[24px]">
                             {feature.text}
                         </p>

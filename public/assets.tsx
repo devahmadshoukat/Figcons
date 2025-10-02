@@ -102,5 +102,25 @@ export const assets = {
 <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M10.4998 12.9167V18.75L4.6665 12.9167M4.6665 12.9167V7.08333H10.4998M4.6665 12.9167H16.3332L10.4998 7.08333M10.4998 7.08333H16.3332V1.25H4.6665L10.4998 7.08333Z" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
+`,
+    youtube: `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M17 20H7C4 20 2 18 2 15V9C2 6 4 4 7 4H17C20 4 22 6 22 9V15C22 18 20 20 17 20Z" stroke="#0E0E0E" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11.4001 9.49981L13.9001 10.9998C14.8001 11.5998 14.8001 12.4998 13.9001 13.0998L11.4001 14.5998C10.4001 15.1998 9.6001 14.6998 9.6001 13.5998V10.5998C9.6001 9.29981 10.4001 8.89981 11.4001 9.49981Z" stroke="#0E0E0E" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`,
+    be: `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 12H9C10.7 12 12 13.3 12 15C12 16.7 10.7 18 9 18H3C2.4 18 2 17.6 2 17V7C2 6.4 2.4 6 3 6H8C9.7 6 11 7.3 11 9C11 10.7 9.7 12 8 12H2Z" stroke="#0E0E0E" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M14 14H22C22 11.8 20.2 10 18 10C15.8 10 14 11.8 14 14ZM14 14C14 16.2 15.8 18 18 18H19.7" stroke="#0E0E0E" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.5 7.5H16.5" stroke="#0E0E0E" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`,
+    instrgram: `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="#0E0E0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="#0E0E0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.6361 7H17.6477" stroke="#0E0E0E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
 `
 }

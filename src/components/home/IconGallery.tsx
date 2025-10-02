@@ -5,7 +5,7 @@ export default function IconGallery() {
     return (
         <div className="w-[100%] flex md:flex-row flex-col">
             <div className="w-[100%] flex justify-center items-center md:w-[50%] h-[600px] border-r border-[#ececec] px-[16px] md:px-[56px] py-[32px] md:py-[64px]" >
-                <Image src="/IconGallery.svg" alt="Icon Gallery" width={1000} height={1000} className="w-[456px] h-[504px]" />
+                <Image src="/IconGallery.svg" alt="Icon Gallery" width={1000} height={1000} className="w-[456px] h-[504px] pointer-events-none" />
             </div>
             <div className="relative w-[100%] md:w-[50%] flex flex-col gap-[56px] px-[16px] md:px-[56px] py-[32px] md:py-[64px]">
                 <p className="text-[#0e0e0e] font-bold text-[16px] leading-[24px]">Stop wasting time searching for the right icons, Illustration, Emojis <span className="text-[#454545] font-normal text-[16px] leading-[24px]">Access Streamline Pro and unlock 300,000+ high-quality, consistent, and fully customizable assets.</span></p>

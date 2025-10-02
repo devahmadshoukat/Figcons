@@ -5,7 +5,7 @@ export default function Hero() {
         <div className="w-[100%] flex flex-col items-center justify-center">
             <div className="w-[100%] mx-auto md:w-[902px] flex flex-col gap-[16px] md:gap-[32px] text-center items-center justify-center">
                 <div className="flex gap-[12px] md:gap-[16px] items-center">
-                    <Image width={1440} height={1000} className="w-[112px] md:w-[140px] h-[40px]" src="/herocollection.svg" alt="Hero" />
+                    <Image width={1440} height={1000} className="w-[112px] md:w-[140px] h-[40px] pointer-events-none" src="/herocollection.svg" alt="Hero" />
                     <p className="text-[#0E0E0E] leading-[20px] text-[11px] md:text-[14px] font-[600]">10k+ User in Over Website Every Month</p>
                 </div>
                 <p className="text-[#0e0e0e] text-[34px] md:text-[64px] leading-[40px] md:leading-[72px] font-[800]">Design assets that ship fast <span className="text-[#dbdbdb]">Icons, Illustrations, Emojis.</span></p>

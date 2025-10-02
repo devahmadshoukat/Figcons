@@ -42,7 +42,7 @@ export default function IconShowcase() {
             <div className="grid gap-[36px] md:gap-[0px] grid-cols-1 md:grid-cols-3">
                 {Cards.map((card, index) => (
                     <div key={index} className="flex flex-col gap-[16px] md:gap-[32px] md:px-[24px] px-[0px] pb-[0px] md:pb-[32px]">
-                        <Image src={card.image} width={999999} height={999999} className="w-[100%] 2xl:h-[408px] md:h-[350px] h-[408px] object-contain md:object-cover rounded-[24px]" alt="" />
+                        <Image src={card.image} width={999999} height={999999} className="w-[100%] 2xl:h-[408px] md:h-[350px] h-[408px] object-contain md:object-cover rounded-[24px] pointer-events-none" alt="" />
                         <div className="flex flex-col justify-start items-start gap-[8px]">
                             <h1 className="text-[#0e0e0e] text-[20px] font-bold leading-[32px]">{card.title}</h1>
                             <p className="text-[#454545] text-[12px] font-normal leading-[20px]">{card.description}</p>

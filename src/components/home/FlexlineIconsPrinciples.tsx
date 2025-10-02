@@ -11,7 +11,7 @@ export const FlexlineIconsPrinciples1 = () => {
             </div>
             <div className="w-[100%] md:w-[70%] flex flex-col gap-[40px] pb-[112px]">
                 <div className="w-[100%] h-[240px] md:h-[400px] bg-[#323232] flex justify-end items-center p-[40px]">
-                    <Image src="/FlexlineIconsPrinciples1.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[600px] h-[160px] md:h-[287px]" />
+                    <Image src="/FlexlineIconsPrinciples1.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[600px] h-[160px] md:h-[287px] pointer-events-none" />
                 </div>
                 <div className="flex flex-col w-[100%] justify-end text-end items-end pr-[24px] md:pr-[40px]">
                     <p className="text-[#b7b7b7] text-[16px] font-normal leading-[24px]">Constructions Principles</p>
@@ -26,7 +26,7 @@ export const FlexlineIconsPrinciples2 = () => {
         <div className="w-[100%] flex md:flex-row flex-col flex-col-reverse gap-[32px] md:gap-[0px]">
             <div className="w-[100%] md:w-[70%] flex flex-col gap-[40px] pb-[112px]">
                 <div className="w-[100%] h-[240px] md:h-[400px] bg-[#323232] flex justify-center items-center p-[40px]">
-                    <Image src="/FlexlineIconsPrinciples2.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[530px] h-[120px] md:h-[160px]" />
+                    <Image src="/FlexlineIconsPrinciples2.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[530px] h-[120px] md:h-[160px] pointer-events-none" />
                 </div>
                 <div className="flex flex-col w-[100%] justify-end text-end items-end pr-[24px] md:pr-[40px]">
                     <p className="text-[#b7b7b7] text-[16px] font-normal leading-[24px]">Constructions Principles</p>
@@ -53,7 +53,7 @@ export const FlexlineIconsPrinciples3 = () => {
             </div>
             <div className="w-[100%] md:w-[70%] flex flex-col gap-[40px] pb-[112px]">
                 <div className="w-[100%] h-[240px] md:h-[400px] bg-[#323232] flex justify-center items-center p-[40px]">
-                    <Image src="/FlexlineIconsPrinciples3.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[530px] h-[186px] md:h-[287px]" />
+                    <Image src="/FlexlineIconsPrinciples3.svg" alt="Flexline Icons Principles" width={1000} height={1000} className="w-[100%] md:w-[530px] h-[186px] md:h-[287px] pointer-events-none" />
                 </div>
                 <div className="flex flex-col w-[100%] justify-end text-end items-end pr-[24px] md:pr-[40px]">
                     <p className="text-[#b7b7b7] text-[16px] font-normal leading-[24px]">Constructions Principles</p>

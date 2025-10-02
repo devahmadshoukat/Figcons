@@ -1,5 +1,6 @@
 import { GridBox } from "@/commons/GridBox";
 import Appbar from "@/components/Appbar";
+import Footer from "@/components/Footer";
 import BuildIcon, { BuildIconTitle } from "@/components/home/BuildIcon";
 import { FlexlineIconsPrinciples1, FlexlineIconsPrinciples2, FlexlineIconsPrinciples3 } from "@/components/home/FlexlineIconsPrinciples";
 import Hero from "@/components/home/Hero";
@@ -36,6 +37,7 @@ export default function HomePage() {
                 <BuildIcon />
                 <Plugin />
             </GridBox>
+            <Footer />
         </div>
     )
 }

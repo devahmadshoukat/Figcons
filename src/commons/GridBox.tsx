@@ -50,7 +50,7 @@ export const GridBox = ({
     const sections = sectionRefs.current.filter(Boolean);
     
     // Create scroll-triggered animations for inner content only
-    sections.forEach((section, index) => {
+    sections.forEach((section) => {
       if (!section) return;
 
       const innerContent = section.querySelector('.inner-content');
@@ -183,7 +183,6 @@ export const GridBox = ({
       {React.Children.map(children, (child, index) => {
         const isLastChild = index === childrenArray.length - 1;
         const shouldAddBorder = hasMultipleChildren && !isLastChild;
-        const isCurrentDark = isDark(index);
         const styles = getSectionStyles(index);
 
         return (

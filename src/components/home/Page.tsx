@@ -18,12 +18,12 @@ export default function HomePage() {
                 classNameChild1="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
                 classNameChild3="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
                 classNameChild4="px-[0] md:px-[64px]"
-                classNameChild5="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
+                classNameChild5="px-[16px] md:px-[0] py-[40px] md:py-[64px]"
                 classNameChild6={true}
                 classNameChild7={true}
                 classNameChild8={true}
                 classNameChild9="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
-                classNameChild11="px-[16px] md:px-[64px] py-[40px] md:py-[64px]"
+                classNameChild11="px-[16px] md:px-[0] py-[40px] md:py-[64px]"
             >
                 <Hero />
                 <IconGallery />

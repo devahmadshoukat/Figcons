@@ -1,65 +1,37 @@
 "use client";
 import Svg from "@/commons/Svg";
 import useMediaQuery from "@/commons/UseMediaQuery";
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useEffect, useState } from 'react';
 
 export const BuildIconTitle = () => {
     const titleRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!titleRef.current) return;
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: titleRef.current,
-                start: "top 85%",
-                end: "bottom 15%",
-                toggleActions: "play none none none",
-                once: true,
-                fastScrollEnd: true,
-            }
-        });
-
-        // Animate title with smooth entrance
-        tl.fromTo(titleRef.current,
-            { 
-                opacity: 0, 
-                y: 40,
-                scale: 0.95
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
             },
-            {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 1.2,
-                ease: "power3.out",
-            }
+            { threshold: 0.3 }
         );
 
-        // Add subtle bounce effect to the title
-        tl.to(titleRef.current, {
-            scale: 1.02,
-            duration: 0.3,
-            ease: "power2.out",
-        }, "-=0.2")
-        .to(titleRef.current, {
-            scale: 1,
-            duration: 0.4,
-            ease: "elastic.out(1, 0.5)",
-        });
+        const currentRef = titleRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
 
-        // Cleanup function
         return () => {
-            tl.kill();
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
         };
     }, []);
     return (
-        <div ref={titleRef} className="w-[100%] flex flex-col gap-[12px] items-center justify-center">
+        <div ref={titleRef} className={`w-[100%] flex flex-col gap-[12px] items-center justify-center transition-all duration-600 ease-out ${
+            isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
+        }`}>
             <h1 className="text-[#0e0e0e] text-[24px] md:text-[30px] font-bold leading-[40px]">BuildIcon</h1>
             <p className="text-[#454545] text-[14px] md:text-[16px] font-normal leading-[24px]">Export and integrate in seconds.</p>
         </div>
@@ -69,69 +41,28 @@ export const BuildIconTitle = () => {
 export default function BuildIcon() {
     const isMobile = useMediaQuery("(max-width: 768px)");
     const buildIconRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!buildIconRef.current) return;
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: buildIconRef.current,
-                start: "top 85%",
-                end: "bottom 15%",
-                toggleActions: "play none none none",
-                once: true,
-                fastScrollEnd: true,
-                refreshPriority: -1,
-            }
-        });
-
-        // Animate feature cards with enhanced stagger and smooth effects
-        tl.fromTo(buildIconRef.current?.children,
-            { 
-                opacity: 0, 
-                y: 30, 
-                scale: 0.9,
-                rotationX: 15
-            },
-            { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1,
-                rotationX: 0,
-                duration: 0.8, 
-                ease: "power3.out",
-                stagger: {
-                    amount: 0.3,
-                    from: "start"
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
                 }
-            }
+            },
+            { threshold: 0.3 }
         );
 
-        // Add subtle hover-like effect to each card
-        tl.to(buildIconRef.current?.children, {
-            scale: 1.02,
-            duration: 0.2,
-            ease: "power2.out",
-            stagger: {
-                amount: 0.1,
-                from: "start"
-            }
-        }, "-=0.4")
-        .to(buildIconRef.current?.children, {
-            scale: 1,
-            duration: 0.3,
-            ease: "elastic.out(1, 0.3)",
-            stagger: {
-                amount: 0.1,
-                from: "start"
-            }
-        });
+        const currentRef = buildIconRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
 
-        // Cleanup function
         return () => {
-            tl.kill();
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
         };
-
     }, []);
 
     const features = [
@@ -154,7 +85,12 @@ export default function BuildIcon() {
             {features.map((feature, index) => (
                 <div
                     key={index}
-                    className={`flex flex-col gap-[16px] items-center justify-center py-[32px] md:py-[70px] px-[20px] md:px-[45px] transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg ${isMobile ? (feature.hasBgMobile && 'bg-[#f6f6f6]') : (feature.hasBgDesktop && 'bg-[#f6f6f6]')}`}
+                    className={`flex flex-col gap-[16px] items-center justify-center py-[32px] md:py-[70px] px-[20px] md:px-[45px] transition-all duration-600 ease-out hover:scale-105 hover:shadow-lg ${
+                        isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
+                    } ${isMobile ? (feature.hasBgMobile && 'bg-[#f6f6f6]') : (feature.hasBgDesktop && 'bg-[#f6f6f6]')}`}
+                    style={{
+                        transitionDelay: isVisible ? `${index * 50}ms` : '0ms'
+                    }}
                 >
                     <div className="h-[155px] md:h-[210px] flex flex-col justify-center items-center md:gap-[56px] gap-[27px] text-center">
                         <Svg className="w-[64px] md:w-[80px] transition-transform duration-300 ease-out hover:scale-110" icon={feature.icon} />

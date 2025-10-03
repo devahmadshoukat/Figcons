@@ -1,49 +1,32 @@
 "use client";
 import Svg, { IconName } from "@/commons/Svg";
 import Image from "next/image";
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useEffect, useState } from 'react';
 
 export default function Plugin() {
     const pluginRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!pluginRef.current) return;
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: pluginRef.current,
-                start: "top 85%",
-                end: "bottom 15%",
-                toggleActions: "play none none none",
-                once: true,
-                fastScrollEnd: true,
-                refreshPriority: -1,
-            }
-        });
-
-        // Animate plugin cards with stagger
-        tl.fromTo(pluginRef.current?.children,
-            { opacity: 0, y: 25, scale: 0.98 },
-            { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1, 
-                duration: 0.5, 
-                ease: "power2.out",
-                stagger: 0.08
-            }
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            { threshold: 0.1 }
         );
 
-        // Cleanup function
-        return () => {
-            tl.kill();
-        };
+        const currentRef = pluginRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
 
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
     }, []);
     const items = [
         {
@@ -77,8 +60,18 @@ export default function Plugin() {
     return (
         <div ref={pluginRef} className="w-[100%] grid md:grid-cols-3 grid-cols-1 gap-[24px] md:gap-[0px]">
             {items.map((item, index) => (
-                <div key={index} className="w-[100%] md:px-[24px] px-[0px] flex flex-col gap-[12px] items-start justify-center">
-                    <Image src={item.image} alt="Plugin" width={1000} height={1000} className="w-[100%] 2xl:h-[400px] md:h-[300px] h-[500px] object-contain pointer-events-none" />
+                <div 
+                    key={index} 
+                    className={`w-[100%] md:px-[24px] px-[0px] flex flex-col gap-[12px] items-center justify-center transition-all duration-1000 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+                        isVisible 
+                            ? 'opacity-100 translate-y-0 blur-0' 
+                            : 'opacity-0 translate-y-6 blur-sm'
+                    }`}
+                    style={{
+                        transitionDelay: isVisible ? `${index * 100}ms` : '0ms'
+                    }}
+                >
+                    <Image src={item.image} alt="Plugin" width={1000} height={1000} className="w-[100%] 2xl:h-[400px] md:h-[400px] h-[500px] object-contain md:object-cover rounded-[32px] pointer-events-none" />
                     <div className="flex flex-col gap-[8px]">
                         <h1 className="text-[20px] text-[#0e0e0e] font-bold leading-[32px]">{item.title}</h1>
                         <p className="text-[12px] text-[#454545] font-normal leading-[20px]">{item.description}</p>

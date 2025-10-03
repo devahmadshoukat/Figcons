@@ -1,51 +1,31 @@
 "use client";
 import Image from "next/image";
-import { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useEffect, useState } from 'react';
 
 export default function IconShowcase() {
     const showcaseRef = useRef<HTMLDivElement>(null);
-    const titleRef = useRef<HTMLDivElement>(null);
-    const cardsRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!showcaseRef.current) return;
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: showcaseRef.current,
-                start: "top 80%",
-                end: "bottom 20%",
-                toggleActions: "play none none reverse",
-            }
-        });
-
-        // Animate title section
-        tl.fromTo(titleRef.current,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            { threshold: 0.1 }
         );
 
-        // Animate cards with stagger and scale effect
-        if (cardsRef.current?.children) {
-            tl.fromTo(cardsRef.current.children,
-                { opacity: 0, y: 50, scale: 0.8 },
-                { 
-                    opacity: 1, 
-                    y: 0, 
-                    scale: 1, 
-                    duration: 0.7, 
-                    ease: "power2.out",
-                    stagger: 0.15
-                },
-                "-=0.4"
-            );
+        const currentRef = showcaseRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
         }
 
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
     }, []);
     const Cards = [
         {
@@ -81,13 +61,20 @@ export default function IconShowcase() {
     ]
     return (
         <div ref={showcaseRef} className="flex flex-col justify-center items-center gap-[32px]">
-            <div ref={titleRef} className="md:w-[568px] w-[100%] flex flex-col gap-[12px] justify-center items-center text-center">
+            <div className={`md:w-[568px] w-[100%] flex flex-col gap-[12px] justify-center items-center text-center transition-all duration-600 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+            }`}>
                 <h1 className="text-[#0e0e0e] text-[20px] md:text-[30px] font-bold leading-[32px] md:leading-[40px]">Everything You Need to Design Smarter</h1>
                 <p className="text-[#454545] text-[14px] md:text-[16px] font-normal leading-[20px] md:leading-[24px]">From clean minimal sets to playful creative styles, everything is crafted to fit perfectly into websites, apps, and brand projects.</p>
             </div>
-            <div ref={cardsRef} className="grid gap-[36px] md:gap-[0px] grid-cols-1 md:grid-cols-3">
+            <div className={`grid gap-[36px] md:gap-[0px] grid-cols-1 md:grid-cols-3 transition-all duration-600 ease-out ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+            }`} style={{ transitionDelay: isVisible ? '150ms' : '0ms' }}>
                 {Cards.map((card, index) => (
-                    <div key={index} className="flex flex-col gap-[16px] md:gap-[32px] md:px-[24px] px-[0px] pb-[0px] md:pb-[32px]">
+                    <div 
+                        key={index} 
+                        className="flex flex-col gap-[16px] md:gap-[32px] md:px-[24px] px-[0px] pb-[0px] md:pb-[32px]"
+                    >
                         <Image src={card.image} width={999999} height={999999} className="w-[100%] 2xl:h-[408px] md:h-[350px] h-[408px] object-contain md:object-cover rounded-[24px] pointer-events-none" alt="" />
                         <div className="flex flex-col justify-start items-start gap-[8px]">
                             <h1 className="text-[#0e0e0e] text-[20px] font-bold leading-[32px]">{card.title}</h1>

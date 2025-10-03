@@ -9,7 +9,7 @@ export default function Appbar() {
     const pathname = usePathname();
 
     const Links = [
-        { name: "Icons", href: "/" },
+        { name: "Icons", href: "/icons" },
         { name: "Illustration", href: "/illustration" },
         { name: "Pricing", href: "/pricing" },
         { name: "Plugin", href: "/plugin" },
@@ -102,6 +102,12 @@ export default function Appbar() {
                             <Link href="/">
                                 <Svg icon="logo" />
                             </Link>
+                            <button
+                                onClick={toggleMenu}
+                                className="bg-[#f6f6f6] w-[40px] h-[40px] rounded-full flex md:hidden items-center justify-center hover:scale-105 transition-transform duration-200"
+                            >
+                                <Svg icon="menu" />
+                            </button>
                         </div>
 
                         {/* Navigation Links */}

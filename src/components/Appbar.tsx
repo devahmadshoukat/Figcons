@@ -79,8 +79,8 @@ export default function Appbar() {
                 </div>
                 <div className={`flex gap-[8px] items-center transition-all duration-600 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
                     }`} style={{ transitionDelay: isVisible ? '500ms' : '0ms' }}>
-                    <Button text="Login" className="w-[65px] md:w-[88px] text-[12px] md:text-[14px] bg-[#0e0e0e] text-[#ffffff] font-bold hover:scale-105 transition-transform duration-200" />
-                    <Button text="Sign Up" className="w-[77px] md:w-[104px] text-[12px] md:text-[14px] bg-[#f6f6f6] text-[#0e0e0e] font-bold hover:scale-105 transition-transform duration-200" />
+                    <Button text="Login" className="w-[65px] md:w-[88px] text-[12px] md:text-[14px] bg-[#0e0e0e] text-[#ffffff] font-bold hover:scale-105 transition-transform duration-200" href="/profile" />
+                    <Button text="Sign Up" className="w-[77px] md:w-[104px] text-[12px] md:text-[14px] bg-[#f6f6f6] text-[#0e0e0e] font-bold hover:scale-105 transition-transform duration-200" href="/profile" />
                 </div>
             </nav>
 

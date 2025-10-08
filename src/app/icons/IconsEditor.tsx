@@ -1,7 +1,6 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
-import { gsap } from "gsap";
 import Svg from "@/commons/Svg";
+import { useRef, useState } from "react";
 
 interface IconsEditorProps {
     selectedIcon: string;
@@ -21,33 +20,6 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
 
     const fileTypes = ["SVG", "PNG", "JSX", "PDF"];
 
-    useEffect(() => {
-        // Animate each section with staggered timing
-        const timeline = gsap.timeline();
-
-        if (iconPreviewRef.current) {
-            timeline.fromTo(iconPreviewRef.current,
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }
-            );
-        }
-
-        if (settingsRef.current) {
-            timeline.fromTo(settingsRef.current,
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
-                "-=0.3"
-            );
-        }
-
-        if (tagsRef.current) {
-            timeline.fromTo(tagsRef.current,
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
-                "-=0.3"
-            );
-        }
-    }, [selectedIcon]);
 
     return (
         <div ref={editorRef} className="w-[100%] md:w-[252px] 2xl:w-[300px] 3xl:w-[350px] w-full h-full flex flex-col gap-[16px] md:px-0 px-[16px] py-[16px] md:py-0 md:pb-[8px]">
@@ -129,7 +101,7 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                     </div>
                 </div>
             </div>
-            <div ref={tagsRef} className="flex flex-col gap-[12px] border-t border-[#ececec]">
+            <div ref={tagsRef} className="flex flex-col gap-[12px] border-t border-[#ececec]" style={{ paddingBottom: "26px" }}>
                 <div className="px-[8px] py-[12px]">
                     <p className="text-[#0e0e0e] text-[12px] font-bold leading-[20px]">Tags</p>
                 </div>

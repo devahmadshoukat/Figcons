@@ -5,6 +5,8 @@ html,
 body {
     scrollbar-width: thin;
     scrollbar-color: #0e0e0e mix(#0e0e0e, #ffffff, 0.1);
+    scroll-behavior: smooth;
+    scroll-padding-top: 120px;
 }
 
 .Kalam {

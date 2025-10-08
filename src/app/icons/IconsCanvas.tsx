@@ -1,19 +1,19 @@
 "use client";
-import { useState, useRef } from "react";
-import { gsap } from "gsap";
-import Svg from "@/commons/Svg";
 import IconsEditor from "@/app/icons/IconsEditor";
+import Svg from "@/commons/Svg";
+import { gsap } from "gsap";
+import { useRef, useState } from "react";
 
 // Const array of available icons
 const ICONS_LIST = [
-    "clouddownload", "energy", "star", "paint", "resize", "brandColors",
-    "share", "arrowbottom", "redo", "search", "puzzle", "instrgram", "FramerPlugin", "Pluginweb", "figma", "be", "youtube"
+    "clouddownload", "star", "paint", "resize", "brandColors",
+    "share", "arrowbottom", "redo", "search", "instrgram", "figma", "be", "youtube"
 ];
 
 export default function IconsCanvas() {
     const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
     const [isEditorOpen, setIsEditorOpen] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
+    const [hasAnimated, setHasAnimated] = useState(false);
 
     const mainContentRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<HTMLDivElement>(null);
@@ -21,8 +21,6 @@ export default function IconsCanvas() {
 
 
     const handleIconClick = (iconName: string) => {
-        if (isAnimating) return; // Prevent clicks during animation
-
         if (selectedIcon === iconName && isEditorOpen) {
             // If clicking the same selected icon, close the editor
             closeEditor();
@@ -33,42 +31,55 @@ export default function IconsCanvas() {
     };
 
     const openEditor = (iconName: string) => {
-        setIsAnimating(true);
         setSelectedIcon(iconName);
         setIsEditorOpen(true);
 
-        // Animate main content width
-        if (mainContentRef.current) {
-            gsap.to(mainContentRef.current, {
-                width: "calc(100% - 252px)",
-                duration: 0.4,
-                ease: "power2.out"
-            });
+        // Prevent body scroll only on mobile
+        if (window.innerWidth < 768) {
+            document.body.style.overflow = 'hidden';
         }
 
-        // Animate editor panel
-        if (editorRef.current) {
-            gsap.fromTo(editorRef.current,
-                { x: 212, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-            );
-        }
+        // Only animate the first time editor opens
+        if (!hasAnimated) {
+            // Animate main content width
+            if (mainContentRef.current) {
+                gsap.to(mainContentRef.current, {
+                    width: "calc(100% - 252px)",
+                    duration: 0.4,
+                    ease: "power2.out"
+                });
+            }
 
-        // Animate mobile editor
-        if (mobileEditorRef.current) {
-            gsap.fromTo(mobileEditorRef.current,
-                { y: "100%", opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-            );
-        }
+            // Animate editor panel
+            if (editorRef.current) {
+                gsap.fromTo(editorRef.current,
+                    { x: 212, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+                );
+            }
 
-        setTimeout(() => setIsAnimating(false), 400);
+            // Animate mobile editor
+            if (mobileEditorRef.current) {
+                gsap.fromTo(mobileEditorRef.current,
+                    { y: "100%", opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+                );
+            }
+
+            setHasAnimated(true);
+        }
     };
 
     const closeEditor = () => {
-        setIsAnimating(true);
+        setIsEditorOpen(false);
+        setSelectedIcon(null);
+        
+        // Restore body scroll only on mobile
+        if (window.innerWidth < 768) {
+            document.body.style.overflow = 'auto';
+        }
 
-        // Animate main content width back
+        // Reset main content width to 100% when closing
         if (mainContentRef.current) {
             gsap.to(mainContentRef.current, {
                 width: "100%",
@@ -76,36 +87,6 @@ export default function IconsCanvas() {
                 ease: "power2.out"
             });
         }
-
-        // Animate editor panel out
-        if (editorRef.current) {
-            gsap.to(editorRef.current, {
-                x: 212,
-                opacity: 0,
-                duration: 0.4,
-                ease: "power2.in",
-                onComplete: () => {
-                    setIsEditorOpen(false);
-                    setSelectedIcon(null);
-                }
-            });
-        }
-
-        // Animate mobile editor out
-        if (mobileEditorRef.current) {
-            gsap.to(mobileEditorRef.current, {
-                y: "100%",
-                opacity: 0,
-                duration: 0.4,
-                ease: "power2.in",
-                onComplete: () => {
-                    setIsEditorOpen(false);
-                    setSelectedIcon(null);
-                }
-            });
-        }
-
-        setTimeout(() => setIsAnimating(false), 400);
     };
 
     return (

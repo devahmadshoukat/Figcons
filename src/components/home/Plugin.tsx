@@ -1,7 +1,7 @@
 "use client";
 import Svg, { IconName } from "@/commons/Svg";
 import Image from "next/image";
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Plugin() {
     const pluginRef = useRef<HTMLDivElement>(null);

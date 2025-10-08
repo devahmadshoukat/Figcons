@@ -26,22 +26,24 @@ export default function NotFound() {
                             Page Not Found
                         </h2>
                         <p className="text-lg text-gray-600 mb-8 max-w-md">
-                            Sorry, we couldn&apos;t find the page you&apos;re looking for. 
+                            Sorry, we couldn&apos;t find the page you&apos;re looking for.
                             It might have been moved, deleted, or you entered the wrong URL.
                         </p>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link href="/">
-                            <Button 
-                                text="Go Home" 
+                            <Button
+                                text="Go Home"
                                 className="bg-[#0e0e0e] text-white hover:bg-[#2a2a2a] transition-colors duration-200"
+                                href="/"
                             />
                         </Link>
                         <Link href="/plugin">
-                            <Button 
-                                text="Browse Icons" 
+                            <Button
+                                text="Browse Icons"
                                 className="border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                                href="/"
                             />
                         </Link>
                     </div>

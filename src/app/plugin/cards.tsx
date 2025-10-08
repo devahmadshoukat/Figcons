@@ -1,7 +1,7 @@
 "use client";
 import Svg, { IconName } from "@/commons/Svg";
 import Image from "next/image";
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Cards() {
     const pluginRef = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ export default function Cards() {
                     observer.unobserve(entry.target);
                 }
             },
-            { 
+            {
                 threshold: 0.2,
                 rootMargin: '0px 0px -50px 0px'
             }
@@ -64,8 +64,7 @@ export default function Cards() {
     ]
     return (
         <div className="flex flex-col justify-center items-center gap-[51px]">
-            <div className={`md:w-[500px] flex flex-col justify-center items-center text-center gap-[12px] transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}>
+            <div className={`md:w-[500px] flex flex-col justify-center items-center text-center gap-[12px] transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 <p className="text-[30px] font-bold leading-[40px]">Design Faster. Design Smarter.</p>
                 <p className="w-[90%] md:w-[100%] text-[16px] leading-[24px]">Access a rich library of icons and illustrations that save you time and elevate your designs.</p>
             </div>
@@ -79,17 +78,17 @@ export default function Cards() {
                             }`}
                         style={{
                             transitionDelay: isVisible ? `${index * 150}ms` : '0ms',
-                            transform: isVisible 
-                                ? 'translateY(0) scale(1)' 
+                            transform: isVisible
+                                ? 'translateY(0) scale(1)'
                                 : 'translateY(32px) scale(0.95)'
                         }}
                     >
-                        <Image 
-                            src={item.image} 
-                            alt="Plugin" 
-                            width={1000} 
-                            height={1000} 
-                            className="w-[100%] 2xl:h-[400px] md:h-[400px] h-[500px] object-contain md:object-cover rounded-[32px] pointer-events-none transition-transform duration-300 hover:scale-105" 
+                        <Image
+                            src={item.image}
+                            alt="Plugin"
+                            width={1000}
+                            height={1000}
+                            className="w-[100%] 2xl:h-[400px] md:h-[400px] h-[500px] object-contain md:object-cover rounded-[32px] pointer-events-none transition-transform duration-300 hover:scale-105"
                         />
                         <div className="flex flex-col gap-[8px]">
                             <h1 className="text-[20px] text-[#0e0e0e] font-bold leading-[32px]">{item.title}</h1>

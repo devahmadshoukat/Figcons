@@ -1,7 +1,7 @@
 "use client";
 import Svg from "@/commons/Svg";
 import useMediaQuery from "@/commons/UseMediaQuery";
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const BuildIconTitle = () => {
     const titleRef = useRef<HTMLDivElement>(null);

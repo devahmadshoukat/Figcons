@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const FlexlineIconsPrinciples1 = () => {
     const principlesRef = useRef<HTMLDivElement>(null);

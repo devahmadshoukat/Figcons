@@ -20,6 +20,10 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
 
     const fileTypes = ["SVG", "PNG", "JSX", "PDF"];
 
+    const tags = [
+        "Fingerprint", "Thumbprint", "Authentication", "Scan", "Touch ID", "Secure", "Security", "Biometric", "Identity", "Scanner", "Login", "Password", "Identification", "Access", "Touch", "ID", "Lock", "Interface", "Box", "Frame"
+    ];
+
 
     return (
         <div ref={editorRef} className="w-[100%] md:w-[252px] 2xl:w-[300px] 3xl:w-[350px] w-full h-full flex flex-col gap-[16px] md:px-0 px-[16px] py-[16px] md:py-0 md:pb-[8px]">
@@ -106,26 +110,11 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                     <p className="text-[#0e0e0e] text-[12px] font-bold leading-[20px]">Tags</p>
                 </div>
                 <div className="flex gap-[8px] justify-start flex-wrap">
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Fingerprint</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Thumbprint</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Authentication</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Scan</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Touch ID</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Secure</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Security</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Biometric</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Identity</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Scanner</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Login</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Password</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Identification</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Access</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Touch</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">ID</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Lock</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Interface</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Box</button>
-                    <button className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">Frame</button>
+                    {tags.map((tag) => (
+                        <button key={tag} className="bg-[#f6f6f6] h-[40px] 2xl:h-[48px] 3xl:h-[52px] px-[16px] py-[4px] rounded-full text-[12px] font-bold leading-[20px] flex items-center justify-center">
+                            {tag}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>

@@ -16,11 +16,11 @@ export default function Profile() {
 
     // Navigation items data
     const navigationItems = [
-        { id: "profile-details", label: "Profile", icon: "profile" },
-        { id: "security", label: "Security", icon: "security" },
-        { id: "social-profile", label: "Social Profile", icon: "social" },
-        { id: "notifications", label: "Notifications", icon: "notifications" },
-        { id: "delete-account", label: "Delete Account", icon: "deleteAccount" }
+        { id: "profile-details", label: "Profile", icon: "profile" as const },
+        { id: "security", label: "Security", icon: "security" as const },
+        { id: "social-profile", label: "Social Profile", icon: "social" as const },
+        { id: "notifications", label: "Notifications", icon: "notifications" as const },
+        { id: "delete-account", label: "Delete Account", icon: "deleteAccount" as const }
     ];
 
     // Form data state
@@ -84,7 +84,7 @@ export default function Profile() {
                                 ? "bg-[#0E0E0E] text-[#ffffff]"
                                 : "bg-[#f6f6f6] text-[#B7B7B7] hover:bg-[#e5e5e5]"
                                 }`}>
-                                <Svg icon={item.icon as any} stroke={activeSection === item.id ? "#ffffff" : "#b7b7b7"} />
+                                <Svg icon={item.icon} stroke={activeSection === item.id ? "#ffffff" : "#b7b7b7"} />
                                 {item.label}
                             </button>
                         </Link>

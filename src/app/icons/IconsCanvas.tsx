@@ -1,140 +1,172 @@
 "use client";
-import IconsEditor from "@/app/icons/IconsEditor";
-import Svg from "@/commons/Svg";
-import { gsap } from "gsap";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import IconsEditor from "./IconsEditor";
 
-// Const array of available icons
-const ICONS_LIST = [
-    "clouddownload", "star", "paint", "resize", "brandColors",
-    "share", "arrowbottom", "redo", "search", "instrgram", "figma", "be", "youtube"
-];
+interface Icon {
+    _id: string;
+    name: string;
+    filename: string;
+    category: { _id: string; name: string };
+}
+
+interface CategoryGroup {
+    _id: string;
+    name: string;
+    total: number;
+    icons: Icon[];
+}
+
+interface Category {
+    _id: string;
+    name: string;
+}
 
 export default function IconsCanvas() {
-    const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
-    const [isEditorOpen, setIsEditorOpen] = useState(false);
-    const [hasAnimated, setHasAnimated] = useState(false);
+    const [categories, setCategories] = useState<CategoryGroup[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedIcon, setSelectedIcon] = useState<Icon | null>(null);
+    const [showEditor, setShowEditor] = useState<boolean>(false);
 
-    const mainContentRef = useRef<HTMLDivElement>(null);
-    const editorRef = useRef<HTMLDivElement>(null);
-    const mobileEditorRef = useRef<HTMLDivElement>(null);
+    const API_BASE = "https://figcons-backend.vercel.app/api/icons";
 
+    /* --------------------------------------------
+       🧠 Fetch All Categories + Icons
+    -------------------------------------------- */
+    const fetchAllCategoriesWithIcons = async () => {
+        setLoading(true);
+        try {
+            const catRes = await fetch(`${API_BASE}/categories`);
+            if (!catRes.ok) throw new Error("Failed to fetch categories");
+            const categoriesList: Category[] = await catRes.json();
 
-    const handleIconClick = (iconName: string) => {
-        if (selectedIcon === iconName && isEditorOpen) {
-            // If clicking the same selected icon, close the editor
-            closeEditor();
+            const categoryData: CategoryGroup[] = await Promise.all(
+                categoriesList.map(async (cat: Category) => {
+                    const res = await fetch(`${API_BASE}/categories/${cat.name}`);
+                    if (!res.ok) return { ...cat, icons: [], total: 0 };
+                    const data: { icons: Icon[]; total: number } = await res.json();
+                    return { _id: cat._id, name: cat.name, icons: data.icons || [], total: data.total || 0 };
+                })
+            );
+
+            setCategories(categoryData);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Failed to load icons");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /* --------------------------------------------
+       🧱 Image Preload (WebP)
+    -------------------------------------------- */
+    const preloadImage = (icon: Icon) => {
+        const img = new window.Image();
+        img.src = `${API_BASE}/${icon._id}/webp/30x30`;
+    };
+
+    /* --------------------------------------------
+       🎯 Handle Icon Selection
+    -------------------------------------------- */
+    const handleIconClick = (icon: Icon) => {
+        // If clicking the same icon, toggle editor visibility
+        if (selectedIcon && selectedIcon._id === icon._id) {
+            setShowEditor(!showEditor);
         } else {
-            // If clicking a different icon or no icon is selected, open the editor
-            openEditor(iconName);
+            // Select new icon and show editor
+            setSelectedIcon(icon);
+            setShowEditor(true);
         }
     };
 
-    const openEditor = (iconName: string) => {
-        setSelectedIcon(iconName);
-        setIsEditorOpen(true);
+    useEffect(() => {
+        fetchAllCategoriesWithIcons();
+    }, []);
 
-        // Prevent body scroll only on mobile
-        if (window.innerWidth < 768) {
-            document.body.style.overflow = 'hidden';
-        }
+    useEffect(() => {
+        // preload all WebPs after categories loaded
+        categories.forEach((cat) => {
+            cat.icons.forEach((icon) => preloadImage(icon));
+        });
+    }, [categories]);
 
-        // Only animate the first time editor opens
-        if (!hasAnimated) {
-            // Animate main content width
-            if (mainContentRef.current) {
-                gsap.to(mainContentRef.current, {
-                    width: "calc(100% - 252px)",
-                    duration: 0.4,
-                    ease: "power2.out"
-                });
-            }
-
-            // Animate editor panel
-            if (editorRef.current) {
-                gsap.fromTo(editorRef.current,
-                    { x: 212, opacity: 0 },
-                    { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-                );
-            }
-
-            // Animate mobile editor
-            if (mobileEditorRef.current) {
-                gsap.fromTo(mobileEditorRef.current,
-                    { y: "100%", opacity: 0 },
-                    { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-                );
-            }
-
-            setHasAnimated(true);
-        }
-    };
-
-    const closeEditor = () => {
-        setIsEditorOpen(false);
-        setSelectedIcon(null);
-        
-        // Restore body scroll only on mobile
-        if (window.innerWidth < 768) {
-            document.body.style.overflow = 'auto';
-        }
-
-        // Reset main content width to 100% when closing
-        if (mainContentRef.current) {
-            gsap.to(mainContentRef.current, {
-                width: "100%",
-                duration: 0.4,
-                ease: "power2.out"
-            });
-        }
-    };
-
+    /* --------------------------------------------
+       🎨 UI
+    -------------------------------------------- */
     return (
-        <div className="w-[100%] md:px-[40px] px-[16px] py-[32px] gap-[10px] flex overflow-x-hidden">
-            <div ref={mainContentRef} className="flex flex-col gap-[32px] w-[100%]">
-                <div className="w-[100%] flex flex-col gap-[20px] justift-center items-start">
-                    <h1 className="text-[#0e0e0e] text-[18px] font-bold leading-[32px] ml-[16px]">3D Editor <span className="ml-[12px] text-[#b7b7b7] text-[14px] font-normal leading-[20px]">{ICONS_LIST.length} Icons</span></h1>
-                    <div className="w-[100%] flex flex-wrap justify-center gap-[12px]">
-                        {ICONS_LIST.map((iconName, index) => (
-                            <div
-                                key={index}
-                                className={`w-[83.5px] md:w-[102px] h-[83.5px] md:h-[102px] rounded-[20px] border flex justify-center items-center cursor-pointer transition-colors ${selectedIcon === iconName
-                                    ? 'border-[#0e0e0e]'
-                                    : 'border-[#ececec]'
-                                    }`}
-                                onClick={() => handleIconClick(iconName)}
-                            >
-                                <Svg stroke="#0e0e0e" w="32px" h="32px" icon={iconName as keyof typeof import("@/public/assets").assets} />
-                            </div>
-                        ))}
-                    </div>
+        <div className="py-8 flex flex-col gap-10">
+            <h1 className="text-[20px] ml-6 font-bold text-gray-800">
+                Icon Library{" "}
+                <span className="ml-3 text-sm text-gray-500">
+                    {loading ? "Loading..." : `${categories.length} Categories`}
+                </span>
+            </h1>
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
+                    {error}
                 </div>
-            </div>
-            {isEditorOpen && selectedIcon && (
-                <>
-                    {/* Desktop: Side panel */}
-                    <div ref={editorRef} className="hidden md:block">
-                        <IconsEditor selectedIcon={selectedIcon} />
-                    </div>
-                    {/* Mobile: Full screen popup */}
-                    <div ref={mobileEditorRef} className="md:hidden fixed inset-0 z-50 bg-white overflow-hidden">
-                        <div className="w-full h-full flex flex-col overflow-hidden">
-                            <div className="flex justify-between items-center p-4 border-b border-[#ececec] flex-shrink-0">
-                                <h2 className="text-[#0e0e0e] text-[18px] font-bold">Icon Editor</h2>
-                                <button
-                                    onClick={closeEditor}
-                                    className="text-[#454545] text-[24px] hover:text-[#0e0e0e]"
-                                >
-                                    ✕
-                                </button>
+            )}
+            <div className="flex px-6 gap-4 justify-center">
+                <div className={`${showEditor ? 'w-[75%]' : 'w-[100%]'} flex flex-col gap-4 overflow-y-hidden`}>
+                    {categories.map((category) => (
+                        <div key={category._id} className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-[17px] font-semibold text-gray-800">
+                                    {category.name}{" "}
+                                    <span className="text-gray-500 text-sm font-normal">
+                                        {category.total} Icons
+                                    </span>
+                                </h2>
                             </div>
-                            <div className="flex-1 overflow-y-auto overscroll-contain">
-                                <IconsEditor selectedIcon={selectedIcon} />
+
+                            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                {category.icons.map((icon) => {
+                                    const imgSrc = `${API_BASE}/${icon._id}/webp/30x30`;
+                                    // Clean up the name: remove "Image preview" suffix and format properly
+                                    const cleanName = icon.name
+                                        .replace(/Image preview$/i, '')
+                                        .replace(/-/g, ' ')
+                                        .split(' ')
+                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                        .join(' ');
+
+                                    return (
+                                        <div
+                                            key={icon._id}
+                                            onClick={() => handleIconClick(icon)}
+                                            className={`relative w-[85px] h-[85px] border rounded-2xl flex flex-col items-center justify-center hover:shadow-md transition-all duration-200 group cursor-pointer ${selectedIcon && selectedIcon._id === icon._id
+                                                    ? 'border-black border-2'
+                                                    : 'border-gray-200'
+                                                }`}
+                                        >
+                                            {/* WebP Icon */}
+                                            <Image
+                                                src={imgSrc}
+                                                alt={cleanName}
+                                                width={30}
+                                                height={30}
+                                                loading="lazy"
+                                            />
+
+                                            {/* Tooltip */}
+                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                                {cleanName}
+                                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
-                    </div>
-                </>
+                    ))}
+                </div>
+                {showEditor && <IconsEditor selectedIcon={selectedIcon} />}
+            </div>
+            {loading && (
+                <div className="text-center text-gray-500 text-sm mt-6">Loading icons...</div>
             )}
         </div>
-    )
+    );
 }

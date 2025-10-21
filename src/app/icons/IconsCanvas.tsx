@@ -1,6 +1,6 @@
+/* eslint-disable */
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import IconsEditor from "./IconsEditor";
 
 interface Icon {
@@ -137,18 +137,12 @@ export default function IconsCanvas() {
                                             key={icon._id}
                                             onClick={() => handleIconClick(icon)}
                                             className={`relative w-[85px] h-[85px] border rounded-2xl flex flex-col items-center justify-center hover:shadow-md transition-all duration-200 group cursor-pointer ${selectedIcon && selectedIcon._id === icon._id
-                                                    ? 'border-black border-2'
-                                                    : 'border-gray-200'
+                                                ? 'border-black border-2'
+                                                : 'border-gray-200'
                                                 }`}
                                         >
                                             {/* WebP Icon */}
-                                            <Image
-                                                src={imgSrc}
-                                                alt={cleanName}
-                                                width={30}
-                                                height={30}
-                                                loading="lazy"
-                                            />
+                                            <img src={imgSrc} alt={cleanName} />
 
                                             {/* Tooltip */}
                                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">

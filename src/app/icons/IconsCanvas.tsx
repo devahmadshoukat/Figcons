@@ -117,15 +117,12 @@ export default function IconsCanvas() {
                                     onClick={() => handleIconClick(item)}
                                     onContextMenu={(e) => e.preventDefault()}
                                     className={`relative w-[83.5px] md:w-[102px] h-[83.5px] md:h-[102px] rounded-[20px] border flex justify-center items-center cursor-pointer transition-all duration-300
-                                        ${item.isPremium
-                                            ? 'border-transparent bg-gradient-to-br from-yellow-200/40 via-yellow-100/30 to-transparent shadow-[0_0_20px_rgba(250,204,21,0.5)] animate-premium'
-                                            : 'hover:border-[#0e0e0e] bg-white hover:shadow-md'
-                                        } ${selectedIcon?.id === item.id ? 'shadow-lg' : ''}`}
+                                              hover:border-[#0e0e0e] bg-white hover:shadow-md`}
                                 >
                                     {/* ♛ Premium badge */}
                                     {item.isPremium && (
-                                        <div className="absolute top-1 right-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white text-[10px] font-bold px-[4px] py-[1px] rounded-full shadow-md border border-yellow-300">
-                                            Premium
+                                        <div className="absolute text-[#0e0e0e] top-1 right-1 text-[14px] font-bold">
+                                            👑
                                         </div>
                                     )}
 
@@ -176,51 +173,6 @@ export default function IconsCanvas() {
                     </div>
                 </div>
             )}
-
-            {/* Premium glow animation and slide animations */}
-            <style jsx>{`
-    @keyframes premiumGlow {
-        0% { box-shadow: 0 0 6px rgba(250, 224, 120, 0.2); }
-        50% { box-shadow: 0 0 14px rgba(250, 224, 120, 0.5); }
-        100% { box-shadow: 0 0 6px rgba(250, 224, 120, 0.2); }
-    }
-    @keyframes slideInRight {
-        0% { 
-            transform: translateX(100%); 
-            opacity: 0; 
-        }
-        100% { 
-            transform: translateX(0); 
-            opacity: 1; 
-        }
-    }
-    @keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-    @keyframes scaleIn {
-        0% { 
-            transform: scale(0.95); 
-            opacity: 0; 
-        }
-        100% { 
-            transform: scale(1); 
-            opacity: 1; 
-        }
-    }
-    .animate-premium {
-        animation: premiumGlow 2s ease-in-out infinite;
-    }
-    .animate-slideInRight {
-        animation: slideInRight 0.3s ease-out;
-    }
-    .animate-fadeIn {
-        animation: fadeIn 0.2s ease-out;
-    }
-    .animate-scaleIn {
-        animation: scaleIn 0.2s ease-out;
-    }
-`}</style>
         </div>
     );
 }

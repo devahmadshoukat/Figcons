@@ -1,166 +1,226 @@
-/* eslint-disable */
 "use client";
 import { useEffect, useState } from "react";
 import IconsEditor from "./IconsEditor";
 
 interface Icon {
-    _id: string;
+    id: string;
     name: string;
-    filename: string;
-    category: { _id: string; name: string };
-}
-
-interface CategoryGroup {
-    _id: string;
-    name: string;
-    total: number;
-    icons: Icon[];
-}
-
-interface Category {
-    _id: string;
-    name: string;
+    cloudinaryUrl: string;
+    isPremium: boolean;
 }
 
 export default function IconsCanvas() {
-    const [categories, setCategories] = useState<CategoryGroup[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const API_URL = 'https://figcons-backend.vercel.app/api/icons';
+    const [icons, setIcons] = useState<Icon[]>([]);
     const [selectedIcon, setSelectedIcon] = useState<Icon | null>(null);
-    const [showEditor, setShowEditor] = useState<boolean>(false);
 
-    const API_BASE = "https://figcons-backend.vercel.app/api/icons";
+    // Draw icon on canvas
+    const drawImageOnCanvas = (canvas: HTMLCanvasElement, imageUrl: string) => {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-    /* --------------------------------------------
-       🧠 Fetch All Categories + Icons
-    -------------------------------------------- */
-    const fetchAllCategoriesWithIcons = async () => {
-        setLoading(true);
-        try {
-            const catRes = await fetch(`${API_BASE}/categories`);
-            if (!catRes.ok) throw new Error("Failed to fetch categories");
-            const categoriesList: Category[] = await catRes.json();
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
 
-            const categoryData: CategoryGroup[] = await Promise.all(
-                categoriesList.map(async (cat: Category) => {
-                    const res = await fetch(`${API_BASE}/categories/${cat.name}`);
-                    if (!res.ok) return { ...cat, icons: [], total: 0 };
-                    const data: { icons: Icon[]; total: number } = await res.json();
-                    return { _id: cat._id, name: cat.name, icons: data.icons || [], total: data.total || 0 };
-                })
-            );
+        img.onload = () => {
+            canvas.width = 40;
+            canvas.height = 40;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            setCategories(categoryData);
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Failed to load icons");
-        } finally {
-            setLoading(false);
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+            const scaledWidth = img.width * scale;
+            const scaledHeight = img.height * scale;
+            const x = (canvas.width - scaledWidth) / 2;
+            const y = (canvas.height - scaledHeight) / 2;
+            ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+        };
+
+        img.onerror = () => {
+            ctx.fillStyle = '#f6f6f6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#b7b7b7';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', canvas.width / 2, canvas.height / 2);
+        };
+
+        img.src = imageUrl;
+    };
+
+    // Handle canvas reference
+    const handleCanvasRef = (canvas: HTMLCanvasElement | null, imageUrl: string) => {
+        if (canvas && imageUrl) {
+            drawImageOnCanvas(canvas, imageUrl);
+            canvas.addEventListener('contextmenu', (e) => e.preventDefault());
         }
     };
 
-    /* --------------------------------------------
-       🧱 Image Preload (WebP)
-    -------------------------------------------- */
-    const preloadImage = (icon: Icon) => {
-        const img = new window.Image();
-        img.src = `${API_BASE}/${icon._id}/webp/30x30`;
-    };
-
-    /* --------------------------------------------
-       🎯 Handle Icon Selection
-    -------------------------------------------- */
-    const handleIconClick = (icon: Icon) => {
-        // If clicking the same icon, toggle editor visibility
-        if (selectedIcon && selectedIcon._id === icon._id) {
-            setShowEditor(!showEditor);
-        } else {
-            // Select new icon and show editor
-            setSelectedIcon(icon);
-            setShowEditor(true);
-        }
-    };
-
+    // Fetch icons and sort premium to top
     useEffect(() => {
-        fetchAllCategoriesWithIcons();
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const sorted = data.data.sort((a: Icon, b: Icon) =>
+                        a.isPremium === b.isPremium ? 0 : a.isPremium ? -1 : 1
+                    );
+                    setIcons(sorted);
+                }
+            })
+            .catch(err => console.error("Error fetching icons:", err));
     }, []);
 
+    // Handle icon click
+    const handleIconClick = (icon: Icon) => {
+        setSelectedIcon(icon);
+    };
+
+    // Handle close editor
+    const handleCloseEditor = () => {
+        setSelectedIcon(null);
+    };
+
+    // Handle body overflow when editor opens/closes
     useEffect(() => {
-        // preload all WebPs after categories loaded
-        categories.forEach((cat) => {
-            cat.icons.forEach((icon) => preloadImage(icon));
-        });
-    }, [categories]);
+        if (selectedIcon) {
+            // Disable body overflow when editor is open
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Re-enable body overflow when editor is closed
+            document.body.style.overflow = 'unset';
+        }
 
-    /* --------------------------------------------
-       🎨 UI
-    -------------------------------------------- */
+        // Cleanup function to restore overflow on component unmount
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [selectedIcon]);
+
     return (
-        <div className="py-8 flex flex-col gap-10">
-            <h1 className="text-[20px] ml-6 font-bold text-gray-800">
-                Icon Library{" "}
-                <span className="ml-3 text-sm text-gray-500">
-                    {loading ? "Loading..." : `${categories.length} Categories`}
-                </span>
-            </h1>
+        <div className="w-full flex">
+            {/* Left side - Icons Canvas */}
+            <div className="flex-1 md:px-[40px] px-[16px] py-[32px] overflow-y-auto w-[80%]">
+                <div className="flex flex-col gap-[32px] w-full">
+                    <div className="flex flex-col gap-[20px] items-start">
+                        <h1 className="text-[#0e0e0e] text-[18px] font-bold leading-[32px] ml-[16px]">
+                            3D Editor
+                            <span className="ml-[12px] text-[#b7b7b7] text-[14px] font-normal leading-[20px]">
+                                {icons.length} Icons
+                            </span>
+                        </h1>
 
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
-                    {error}
-                </div>
-            )}
-            <div className="flex px-6 gap-4 justify-center">
-                <div className={`${showEditor ? 'w-[75%]' : 'w-[100%]'} flex flex-col gap-4 overflow-y-hidden`}>
-                    {categories.map((category) => (
-                        <div key={category._id} className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-[17px] font-semibold text-gray-800">
-                                    {category.name}{" "}
-                                    <span className="text-gray-500 text-sm font-normal">
-                                        {category.total} Icons
-                                    </span>
-                                </h2>
-                            </div>
-
-                            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                                {category.icons.map((icon) => {
-                                    const imgSrc = `${API_BASE}/${icon._id}/webp/30x30`;
-                                    // Clean up the name: remove "Image preview" suffix and format properly
-                                    const cleanName = icon.name
-                                        .replace(/Image preview$/i, '')
-                                        .replace(/-/g, ' ')
-                                        .split(' ')
-                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                        .join(' ');
-
-                                    return (
-                                        <div
-                                            key={icon._id}
-                                            onClick={() => handleIconClick(icon)}
-                                            className={`relative w-[85px] h-[85px] border rounded-2xl flex flex-col items-center justify-center hover:shadow-md transition-all duration-200 group cursor-pointer ${selectedIcon && selectedIcon._id === icon._id
-                                                ? 'border-black border-2'
-                                                : 'border-gray-200'
-                                                }`}
-                                        >
-                                            {/* WebP Icon */}
-                                            <img src={imgSrc} alt={cleanName} />
-
-                                            {/* Tooltip */}
-                                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                                                {cleanName}
-                                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                                            </div>
+                        <div className="w-full flex flex-wrap justify-center gap-[12px]">
+                            {icons.map((item, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => handleIconClick(item)}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    className={`relative w-[83.5px] md:w-[102px] h-[83.5px] md:h-[102px] rounded-[20px] border flex justify-center items-center cursor-pointer transition-all duration-300
+                                        ${item.isPremium
+                                            ? 'border-transparent bg-gradient-to-br from-yellow-200/40 via-yellow-100/30 to-transparent shadow-[0_0_20px_rgba(250,204,21,0.5)] animate-premium'
+                                            : 'hover:border-[#0e0e0e] bg-white hover:shadow-md'
+                                        } ${selectedIcon?.id === item.id ? 'shadow-lg' : ''}`}
+                                >
+                                    {/* ♛ Premium badge */}
+                                    {item.isPremium && (
+                                        <div className="absolute top-1 right-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white text-[10px] font-bold px-[4px] py-[1px] rounded-full shadow-md border border-yellow-300">
+                                            Premium
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    )}
+
+                                    <canvas
+                                        ref={(canvas) => handleCanvasRef(canvas, item.cloudinaryUrl)}
+                                        className="w-10 h-10 rounded-lg"
+                                        style={{ imageRendering: 'auto' }}
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    />
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
-                {showEditor && <IconsEditor selectedIcon={selectedIcon} />}
             </div>
-            {loading && (
-                <div className="text-center text-gray-500 text-sm mt-6">Loading icons...</div>
+
+            {/* Backdrop overlay */}
+            {selectedIcon && (
+                <div
+                    className="fixed inset-0 bg-black/20 z-[9999] animate-fadeIn"
+                    onClick={handleCloseEditor}
+                />
             )}
+
+            {/* Right side - Icons Editor */}
+            {selectedIcon && (
+                <div className="fixed right-0 top-0 w-[100%] md:w-[300px] 3xl:w-[350px] h-full bg-white border-l border-[#ececec] shadow-2xl z-[9999] overflow-y-auto animate-slideInRight" style={{ scrollbarWidth: 'thin' }}>
+                    <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-[#ececec] p-4 z-10">
+                        <div className="flex justify-between items-center">
+                            <div className="flex flex-col gap-[2px]">
+                                <h2 className="text-[#0e0e0e] text-[16px] font-bold leading-[20px]">Icon Editor</h2>
+                                <p className="text-[#666666] text-[11px] font-normal leading-[14px]">Customize and export</p>
+                            </div>
+                            <button
+                                onClick={handleCloseEditor}
+                                className="text-[#454545] hover:text-[#0e0e0e] transition-all duration-200 p-2 rounded-full hover:bg-gray-100 hover:scale-105"
+                                title="Close editor"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="p-4 pb-8">
+                        <IconsEditor selectedIcon={selectedIcon} onClose={handleCloseEditor} />
+                    </div>
+                </div>
+            )}
+
+            {/* Premium glow animation and slide animations */}
+            <style jsx>{`
+    @keyframes premiumGlow {
+        0% { box-shadow: 0 0 6px rgba(250, 224, 120, 0.2); }
+        50% { box-shadow: 0 0 14px rgba(250, 224, 120, 0.5); }
+        100% { box-shadow: 0 0 6px rgba(250, 224, 120, 0.2); }
+    }
+    @keyframes slideInRight {
+        0% { 
+            transform: translateX(100%); 
+            opacity: 0; 
+        }
+        100% { 
+            transform: translateX(0); 
+            opacity: 1; 
+        }
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @keyframes scaleIn {
+        0% { 
+            transform: scale(0.95); 
+            opacity: 0; 
+        }
+        100% { 
+            transform: scale(1); 
+            opacity: 1; 
+        }
+    }
+    .animate-premium {
+        animation: premiumGlow 2s ease-in-out infinite;
+    }
+    .animate-slideInRight {
+        animation: slideInRight 0.3s ease-out;
+    }
+    .animate-fadeIn {
+        animation: fadeIn 0.2s ease-out;
+    }
+    .animate-scaleIn {
+        animation: scaleIn 0.2s ease-out;
+    }
+`}</style>
         </div>
     );
 }

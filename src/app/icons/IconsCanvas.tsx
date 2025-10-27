@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import IconsEditor from "./IconsEditor";
+import { BACKEND_URL } from "@/commons/Api";
 
 interface Icon {
     _id: string;
@@ -30,7 +31,7 @@ interface PaginationInfo {
 }
 
 export default function IconsCanvas() {
-    const API_URL = 'https://figcons-backend.vercel.app/api/icons';
+    const API_URL = `${BACKEND_URL}/api/icons`;
     const [icons, setIcons] = useState<Icon[]>([]);
     const [selectedIcon, setSelectedIcon] = useState<Icon | null>(null);
     const [pagination, setPagination] = useState<PaginationInfo | null>(null);

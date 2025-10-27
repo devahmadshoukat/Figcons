@@ -6,6 +6,7 @@ import Appbar from "@/components/Appbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/commons/AuthContext";
 import ProtectedRoute from "@/commons/ProtectedRoute";
+import { BACKEND_URL } from "@/commons/Api";
 
 export default function Signin() {
     const router = useRouter();
@@ -30,7 +31,7 @@ export default function Signin() {
 
     const handleGoogleSignin = () => {
         // Redirect to backend Google OAuth
-        window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://figcons.vercel.app'}/api/auth/google`;
+        window.location.href = `${BACKEND_URL}/api/auth/google`;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +48,7 @@ export default function Signin() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://figcons.vercel.app'}/api/auth/login`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || BACKEND_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

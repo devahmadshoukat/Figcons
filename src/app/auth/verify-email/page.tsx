@@ -5,6 +5,7 @@ import { useAuth } from '@/commons/AuthContext';
 import ProtectedRoute from '@/commons/ProtectedRoute';
 import Appbar from '@/components/Appbar';
 import Footer from '@/components/Footer';
+import { BACKEND_URL } from "@/commons/Api";
 
 function VerifyEmailContent() {
     const router = useRouter();
@@ -25,7 +26,7 @@ function VerifyEmailContent() {
             }
 
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://figcons.vercel.app'}/api/auth/verify-email?token=${token}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || BACKEND_URL}/api/auth/verify-email?token=${token}`);
                 const data = await response.json();
 
                 if (data.success) {
@@ -59,7 +60,7 @@ function VerifyEmailContent() {
         if (!user?.email) return;
         
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://figcons.vercel.app'}/api/auth/resend-verification`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || BACKEND_URL}/api/auth/resend-verification`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { BACKEND_URL } from "@/commons/Api";
 
 interface User {
     id: string;
@@ -163,7 +164,7 @@ export const authUtils = {
     async upgradeToPremium(): Promise<boolean> {
         try {
             const response = await this.apiRequest(
-                `${process.env.NEXT_PUBLIC_API_URL || 'https://figcons.vercel.app'}/api/auth/upgrade-premium`,
+                `${process.env.NEXT_PUBLIC_API_URL || BACKEND_URL}/api/auth/upgrade-premium`,
                 { method: 'POST' }
             );
 

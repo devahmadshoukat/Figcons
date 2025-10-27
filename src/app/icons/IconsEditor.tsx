@@ -2,6 +2,7 @@
 import Svg from "@/commons/Svg";
 import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useAuth } from "@/commons/AuthContext";
 
 interface Icon {
     _id: string;
@@ -25,6 +26,7 @@ interface IconsEditorProps {
 }
 
 export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
+    const { user } = useAuth();
     const editorRef = useRef<HTMLDivElement>(null);
     const iconPreviewRef = useRef<HTMLDivElement>(null);
     const buttonsRef = useRef<HTMLDivElement>(null);
@@ -40,11 +42,13 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
     const [hasFill, setHasFill] = useState<boolean>(true);
     const [hasStroke, setHasStroke] = useState<boolean>(true);
     const [customSVG, setCustomSVG] = useState<string>("");
+    const [originalSVG, setOriginalSVG] = useState<string>("");
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
     const [isDownloading, setIsDownloading] = useState<boolean>(false);
     const [showPremiumModal, setShowPremiumModal] = useState<boolean>(false);
     const [showCopiedNotification, setShowCopiedNotification] = useState<boolean>(false);
     const [showPremiumCopyModal, setShowPremiumCopyModal] = useState<boolean>(false);
+    const [hasCustomChanges, setHasCustomChanges] = useState<boolean>(false);
 
     const fileTypes = ["SVG", "PNG", "JPG", "ICO"];
 
@@ -57,6 +61,9 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
         try {
             const response = await fetch(svgUrl);
             const svgText = await response.text();
+
+            // Store original SVG
+            setOriginalSVG(svgText);
 
             // Check for fill attributes
             const hasFillAttr = svgText.includes('fill=') || svgText.includes('fill:');
@@ -178,6 +185,49 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
         }
     }, [selectedIcon, fillColor, strokeColor, stroke, hasFill, hasStroke, isInitialized, createCustomSVG]);
 
+    // Detect if custom changes have been made
+    const checkForCustomChanges = useCallback(() => {
+        if (!originalSVG || !isInitialized) return false;
+        
+        // Extract original values from SVG
+        let originalFillColor = "#000000";
+        let originalStrokeColor = "#000000";
+        let originalStrokeWidth = 2;
+        
+        // Extract original fill color
+        const fillMatch = originalSVG.match(/fill="([^"]*)"/) || originalSVG.match(/fill:([^;]*);/);
+        if (fillMatch && fillMatch[1] && fillMatch[1] !== 'none') {
+            originalFillColor = fillMatch[1];
+        }
+        
+        // Extract original stroke color
+        const strokeMatch = originalSVG.match(/stroke="([^"]*)"/) || originalSVG.match(/stroke:([^;]*);/);
+        if (strokeMatch && strokeMatch[1] && strokeMatch[1] !== 'none') {
+            originalStrokeColor = strokeMatch[1];
+        }
+        
+        // Extract original stroke width
+        const strokeWidthMatch = originalSVG.match(/stroke-width="([^"]*)"/) || originalSVG.match(/stroke-width:([^;]*);/);
+        if (strokeWidthMatch && strokeWidthMatch[1]) {
+            const strokeWidth = parseFloat(strokeWidthMatch[1]);
+            if (!isNaN(strokeWidth)) {
+                originalStrokeWidth = strokeWidth;
+            }
+        }
+        
+        // Check if any custom properties have been changed from original
+        const hasCustomFill = fillColor !== originalFillColor;
+        const hasCustomStroke = strokeColor !== originalStrokeColor;
+        const hasCustomStrokeWidth = stroke !== originalStrokeWidth;
+        
+        return hasCustomFill || hasCustomStroke || hasCustomStrokeWidth;
+    }, [originalSVG, isInitialized, fillColor, strokeColor, stroke]);
+
+    // Update hasCustomChanges when properties change
+    useEffect(() => {
+        setHasCustomChanges(checkForCustomChanges());
+    }, [fillColor, strokeColor, stroke, originalSVG, isInitialized, checkForCustomChanges]);
+
 
     // Handle copy functionality
     const handleCopy = async () => {
@@ -187,26 +237,28 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
             return;
         }
 
-        // Check if premium icon and SVG format - show premium copy modal
-        if (selectedIcon?.isPremium && fileType === 'SVG') {
+        // Check if premium icon and SVG format - show premium copy modal only if user is not premium
+        if (selectedIcon?.isPremium && fileType === 'SVG' && !user?.isPremium) {
             setShowPremiumCopyModal(true);
             return;
         }
 
-        if (customSVG) {
+        const svgContent = hasCustomChanges && customSVG ? customSVG : originalSVG;
+        
+        if (svgContent) {
             try {
                 if (fileType === 'SVG') {
                 // Copy SVG content to clipboard
-                await navigator.clipboard.writeText(customSVG);
-                console.log('Custom SVG copied to clipboard');
+                await navigator.clipboard.writeText(svgContent);
+                console.log('SVG copied to clipboard');
                     displayCopiedNotification();
                 } else if (fileType === 'PNG' || fileType === 'JPG') {
                     // Convert to the selected format and copy
                     let blob: Blob;
                     if (fileType === 'PNG') {
-                        blob = await svgToPng(customSVG, size);
+                        blob = await svgToPng(svgContent, size);
                     } else {
-                        blob = await svgToJpg(customSVG, size);
+                        blob = await svgToJpg(svgContent, size);
                     }
                     
                     await navigator.clipboard.write([
@@ -433,8 +485,8 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
     const handleDownload = async () => {
         if (!selectedIcon || isDownloading) return;
 
-        // Check if premium icon restrictions apply
-        if (selectedIcon.isPremium && fileType === 'SVG') {
+        // Check if premium icon restrictions apply - only restrict if user is not premium
+        if (selectedIcon.isPremium && fileType === 'SVG' && !user?.isPremium) {
             setShowPremiumModal(true);
             return;
         }
@@ -447,7 +499,7 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
             // let mimeType: string;
 
             const iconName = selectedIcon.name || 'icon';
-            const svgContent = customSVG || await fetch(selectedIcon.cloudinaryUrl).then(res => res.text());
+            const svgContent = hasCustomChanges && customSVG ? customSVG : originalSVG || await fetch(selectedIcon.cloudinaryUrl).then(res => res.text());
 
             switch (fileType) {
                 case 'SVG':
@@ -534,7 +586,7 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                 </div>
                 <div className="border border-[#ececec] rounded-[20px] h-[200px] bg-gradient-to-br from-[#fafafa] to-[#f5f5f5] flex justify-center items-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#f0f0f0] opacity-50"></div>
-                    {customSVG ? (
+                    {hasCustomChanges && customSVG ? (
                         <div
                             className="flex items-center justify-center relative"
                             style={{
@@ -542,6 +594,15 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                                 height: `${Math.min(size, 180)}px`
                             }}
                             dangerouslySetInnerHTML={{ __html: customSVG }}
+                        />
+                    ) : originalSVG ? (
+                        <div
+                            className="flex items-center justify-center relative"
+                            style={{
+                                width: `${Math.min(size, 180)}px`,
+                                height: `${Math.min(size, 180)}px`
+                            }}
+                            dangerouslySetInnerHTML={{ __html: originalSVG }}
                         />
                     ) : selectedIcon?.cloudinaryUrl ? (
                         <div
@@ -625,6 +686,8 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                             setStroke(2);
                             setFillColor("#000000");
                             setStrokeColor("#000000");
+                            setHasCustomChanges(false);
+                            setCustomSVG("");
                             // Re-analyze the SVG to get original colors
                             if (selectedIcon?.cloudinaryUrl) {
                                 analyzeSVG(selectedIcon.cloudinaryUrl);
@@ -717,7 +780,7 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                     <h2 className="text-[#0e0e0e] text-[14px] font-semibold leading-[20px]">File type</h2>
                     <div className="w-full px-[6px] py-[6px] bg-[#ffffff] rounded-full h-[48px] flex border border-[#e9ecef]">
                         {fileTypes.map((type) => {
-                            const isDisabled = selectedIcon?.isPremium && type === 'SVG';
+                            const isDisabled = selectedIcon?.isPremium && type === 'SVG' && !user?.isPremium;
                             return (
                             <button
                                 key={type}
@@ -730,7 +793,7 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                                     ? 'bg-[#0e0e0e] rounded-full text-[#ffffff] shadow-sm'
                                     : 'text-[#666666] hover:text-[#0e0e0e] hover:bg-[#f8f9fa]'
                                     }`}
-                                    title={isDisabled ? 'Premium icons only available in PNG/PDF format' : ''}
+                                    title={isDisabled ? 'Premium icons require Pro account for SVG access' : ''}
                             >
                                 {type}
                                     {isDisabled && <span className="ml-1 text-[10px]">🔒</span>}
@@ -782,8 +845,8 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                         
                         <div className="mb-6">
                             <p className="text-[#666666] text-[14px] leading-[20px] mb-4">
-                                Premium icons cannot be copied as SVG to protect the source code. 
-                                You can copy them in other formats or download them.
+                                Premium icons require a Pro account for SVG copy access. 
+                                You can copy them in other formats or upgrade to Pro for full access.
                             </p>
                             
                             <div className="bg-[#f8f9fa] rounded-[12px] p-4 border border-[#e9ecef]">
@@ -819,12 +882,23 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                             </button>
                         </div>
                         
-                        <button
-                            onClick={() => setShowPremiumCopyModal(false)}
-                            className="w-full mt-3 px-4 py-2 bg-[#f8f9fa] text-[#666666] rounded-full text-[14px] font-semibold hover:bg-[#e9ecef] transition-all duration-200"
-                        >
-                            Cancel
-                        </button>
+                        <div className="flex gap-3 mt-3">
+                            <button
+                                onClick={() => {
+                                    setShowPremiumCopyModal(false);
+                                    window.location.href = '/profile#pro-upgrade';
+                                }}
+                                className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-full text-[14px] font-semibold hover:from-yellow-500 hover:to-yellow-700 transition-all duration-200"
+                            >
+                                Upgrade to Pro
+                            </button>
+                            <button
+                                onClick={() => setShowPremiumCopyModal(false)}
+                                className="flex-1 px-4 py-2 bg-[#f8f9fa] text-[#666666] rounded-full text-[14px] font-semibold hover:bg-[#e9ecef] transition-all duration-200"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -845,8 +919,8 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                         
                         <div className="mb-6">
                             <p className="text-[#666666] text-[14px] leading-[20px] mb-4">
-                                Premium icons are only available in PNG, JPG, and ICO formats with watermarks. 
-                                SVG downloads are restricted to protect premium content.
+                                Premium icons require a Pro account for SVG access. 
+                                Free users can download in PNG, JPG, and ICO formats with watermarks.
                             </p>
                             
                             <div className="bg-[#f8f9fa] rounded-[12px] p-4 border border-[#e9ecef]">
@@ -892,12 +966,23 @@ export default function IconsEditor({ selectedIcon }: IconsEditorProps) {
                             </button>
                         </div>
                         
-                        <button
-                            onClick={() => setShowPremiumModal(false)}
-                            className="w-full mt-3 px-4 py-2 bg-[#f8f9fa] text-[#666666] rounded-full text-[14px] font-semibold hover:bg-[#e9ecef] transition-all duration-200"
-                        >
-                            Cancel
-                        </button>
+                        <div className="flex gap-3 mt-3">
+                            <button
+                                onClick={() => {
+                                    setShowPremiumModal(false);
+                                    window.location.href = '/profile#pro-upgrade';
+                                }}
+                                className="flex-1 px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-full text-[14px] font-semibold hover:from-yellow-500 hover:to-yellow-700 transition-all duration-200"
+                            >
+                                Upgrade to Pro
+                            </button>
+                            <button
+                                onClick={() => setShowPremiumModal(false)}
+                                className="flex-1 px-4 py-2 bg-[#f8f9fa] text-[#666666] rounded-full text-[14px] font-semibold hover:bg-[#e9ecef] transition-all duration-200"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

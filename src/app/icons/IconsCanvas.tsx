@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import IconsEditor from "./IconsEditor";
 
 interface Icon {
@@ -168,11 +168,11 @@ export default function IconsCanvas() {
     };
 
     // Load more icons for infinite scroll
-    const loadMoreIcons = () => {
+    const loadMoreIcons = useCallback(() => {
         if (!loadingMore && hasMorePages && pagination) {
             fetchIcons(currentPage + 1, true);
         }
-    };
+    }, [loadingMore, hasMorePages, pagination, currentPage]);
 
     // Infinite scroll detection with throttling
     useEffect(() => {
@@ -199,7 +199,7 @@ export default function IconsCanvas() {
             window.removeEventListener('scroll', handleScroll);
             clearTimeout(timeoutId);
         };
-    }, [loadingMore, hasMorePages, currentPage, pagination]);
+    }, [loadingMore, hasMorePages, currentPage, pagination, loadMoreIcons]);
 
     // Handle body overflow when editor opens/closes
     useEffect(() => {

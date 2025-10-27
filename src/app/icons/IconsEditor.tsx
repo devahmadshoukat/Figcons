@@ -4,10 +4,19 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
 interface Icon {
-    id: string;
+    _id: string;
     name: string;
     cloudinaryUrl: string;
     isPremium: boolean;
+    category: {
+        _id: string;
+        name: string;
+        cloudinaryFolder: string;
+    };
+    isPublic: boolean;
+    fileName: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface IconsEditorProps {

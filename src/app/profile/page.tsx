@@ -64,34 +64,40 @@ export default function Profile() {
         }
     }, [user, updateUser]);
 
-    // Refresh user data on component mount to ensure latest info
+    // Refresh user data once on mount to ensure latest info
     useEffect(() => {
+        let isCancelled = false;
+
         const refreshUserData = async () => {
             if (typeof window === 'undefined') return; // Skip on server side
 
             const token = localStorage.getItem('authToken');
-            if (token && user) {
-                try {
-                    const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
+            if (!token) return;
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.success && data.user) {
-                            updateUser(data.user);
-                        }
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
                     }
-                } catch (error) {
+                });
+
+                if (!isCancelled && response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.user) {
+                        updateUser(data.user);
+                    }
+                }
+            } catch (error) {
+                if (!isCancelled) {
                     console.error('Error refreshing user data:', error);
                 }
             }
         };
 
         refreshUserData();
-    }, [updateUser, user]);
+
+        return () => { isCancelled = true; };
+    }, []);
 
     // Calculate time until subscription expiry
     const calculateTimeUntilExpiry = (expiryDate: string) => {

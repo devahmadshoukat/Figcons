@@ -35,8 +35,9 @@ function VerifyEmailContent() {
                     setUser(data.user);
                     
                     // Auto-login the user after successful verification
-                    const loginToken = generateToken(data.user.id);
-                    login(loginToken, data.user);
+                    if (data.token) {
+                        login(data.token, data.user);
+                    }
                     
                     // Redirect to home after 3 seconds
                     setTimeout(() => {
@@ -81,11 +82,7 @@ function VerifyEmailContent() {
         }
     };
 
-    const generateToken = (userId: string) => {
-        // This is a simplified token generation for demo purposes
-        // In production, you should use proper JWT generation
-        return btoa(JSON.stringify({ userId, timestamp: Date.now() }));
-    };
+    // Removed client-side fake token generation; use server-issued JWT
 
     return (
         <ProtectedRoute requireAuth={false}>

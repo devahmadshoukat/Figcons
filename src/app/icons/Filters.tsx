@@ -1,6 +1,12 @@
 import Svg from "@/commons/Svg";
 
-export default function Filters() {
+interface FiltersProps {
+    color: string;
+    onColorChange: (color: string) => void;
+    onReset?: () => void;
+}
+
+export default function Filters({ color, onColorChange, onReset }: FiltersProps) {
     return (
         <div className="w-[100%] border-t border-[#ececec] py-[24px]">
             <div className="flex md:flex-row flex-col justify-start items-start md:justify-between gap-[20px] items-center md:px-[40px] px-[16px]">
@@ -17,10 +23,20 @@ export default function Filters() {
                 <div className="flex md:flex-row flex-col gap-[8px] md:gap-[20px] items-start md:items-center">
                     <h1 className="text-[#0e0e0e] font-bold leading-[40px] text-[12px] md:text-[14px]">Colors</h1>
                     <div className="flex gap-[8px] items-center">
-                        <input type="color" className="w-[48px] h-[48px] rounded-full bg-[#0e0e0e]" name="" id="" />
-                        <div className="w-[48px] h-[48px] rounded-full bg-[#f6f6f6] flex justify-center items-center" >
+                        <input
+                            type="color"
+                            className="w-[48px] h-[48px] rounded-full bg-[#0e0e0e]"
+                            value={color}
+                            onChange={(e) => onColorChange(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={onReset}
+                            className="w-[48px] h-[48px] rounded-full bg-[#f6f6f6] flex justify-center items-center"
+                            aria-label="Undo color"
+                        >
                             <Svg icon="undo" />
-                        </div>
+                        </button>
                         <div className="w-[48px] h-[48px] rounded-full bg-[#f6f6f6] flex justify-center items-center" >
                             <Svg icon="redo" />
                         </div>

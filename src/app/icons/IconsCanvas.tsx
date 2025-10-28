@@ -30,7 +30,11 @@ interface PaginationInfo {
     prevPage: number | null;
 }
 
-export default function IconsCanvas() {
+interface IconsCanvasProps {
+    tintColor?: string;
+}
+
+export default function IconsCanvas({ tintColor = "#0e0e0e" }: IconsCanvasProps) {
     const API_URL = `${BACKEND_URL}/api/icons`;
     const [icons, setIcons] = useState<Icon[]>([]);
     const [selectedIcon, setSelectedIcon] = useState<Icon | null>(null);
@@ -60,6 +64,14 @@ export default function IconsCanvas() {
             const x = (canvas.width - scaledWidth) / 2;
             const y = (canvas.height - scaledHeight) / 2;
             ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+            // Apply tint color over the drawn image while preserving alpha
+            if (tintColor) {
+                ctx.globalCompositeOperation = 'source-in';
+                ctx.fillStyle = tintColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+            }
         };
 
         img.onerror = () => {
@@ -82,6 +94,17 @@ export default function IconsCanvas() {
             canvas.addEventListener('contextmenu', (e) => e.preventDefault());
         }
     };
+
+    // Redraw canvases when tintColor changes
+    useEffect(() => {
+        const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas[data-icon-src]');
+        canvases.forEach((cv) => {
+            const src = cv.getAttribute('data-icon-src');
+            if (src) {
+                drawImageOnCanvas(cv, src);
+            }
+        });
+    }, [tintColor]);
 
     // Fetch icons with infinite scroll support
     const fetchIcons = async (page: number = 1, append: boolean = false) => {
@@ -308,6 +331,7 @@ export default function IconsCanvas() {
                                         <canvas
                                             ref={(canvas) => handleCanvasRef(canvas, item.cloudinaryUrl)}
                                             className="w-[32px] h-[32px] rounded-lg"
+                                            data-icon-src={item.cloudinaryUrl}
                                             style={{ imageRendering: 'auto' }}
                                             onContextMenu={(e) => e.preventDefault()}
                                         />

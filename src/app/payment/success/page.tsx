@@ -1,42 +1,34 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { authAPI, setAuthToken } from "@/commons/Api";
+import { paymentAPI } from "@/commons/Api";
 import Link from "next/link";
 
-function VerifyEmailContent() {
+function PaymentSuccessContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'missing'>('verifying');
-    const [message, setMessage] = useState("Verifying your email...");
+    const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+    const [message, setMessage] = useState("Verifying your payment...");
     const [countdown, setCountdown] = useState(5);
-    const [resendLoading, setResendLoading] = useState(false);
-    const [resendMessage, setResendMessage] = useState("");
 
     useEffect(() => {
-        const verifyEmail = async () => {
+        const confirmPayment = async () => {
             try {
-                // Get token from query params
-                const token = searchParams.get('token');
+                // Get session_id from query params
+                const sessionId = searchParams.get('session_id');
 
-                // Check if token exists
-                if (!token) {
-                    setStatus('missing');
-                    setMessage('No verification token provided');
+                if (!sessionId) {
+                    setStatus('error');
+                    setMessage('No payment session found');
                     return;
                 }
 
-                // Call backend to verify email
-                const response = await authAPI.verifyEmail(token);
+                // Confirm payment with backend
+                const response = await paymentAPI.confirmPayment(sessionId);
 
                 if (response.success) {
                     setStatus('success');
-                    setMessage(response.message || 'Email verified successfully!');
-
-                    // If token is returned, save it (user is now logged in)
-                    if (response.token) {
-                        setAuthToken(response.token);
-                    }
+                    setMessage('Payment successful! Your premium access is now active.');
 
                     // Start countdown
                     let count = 5;
@@ -45,57 +37,26 @@ function VerifyEmailContent() {
                         setCountdown(count);
                         if (count <= 0) {
                             clearInterval(interval);
-                            // Redirect based on whether user is logged in
-                            if (response.token) {
-                                router.push('/');
-                            } else {
-                                router.push('/auth/signin');
-                            }
+                            router.push('/icons');
                         }
                     }, 1000);
 
                     return () => clearInterval(interval);
                 }
             } catch (error: any) {
-                console.error('Verification error:', error);
+                console.error('Payment confirmation error:', error);
                 setStatus('error');
-                setMessage(error.message || 'Email verification failed. The link may be invalid or expired.');
+                setMessage(error.message || 'Payment verification failed. Please contact support.');
             }
         };
 
-        verifyEmail();
+        confirmPayment();
     }, [searchParams, router]);
-
-    const handleResendVerification = async () => {
-        setResendLoading(true);
-        setResendMessage("");
-        
-        try {
-            // Note: This requires the user to be logged in
-            // If not logged in, redirect to signin
-            const response = await authAPI.resendVerification();
-            
-            if (response.success) {
-                setResendMessage("Verification email sent! Please check your inbox.");
-            }
-        } catch (error: any) {
-            if (error.message.includes('No token provided') || error.message.includes('authentication')) {
-                setResendMessage("Please sign in first to resend verification email.");
-                setTimeout(() => {
-                    router.push('/auth/signin');
-                }, 2000);
-            } else {
-                setResendMessage(error.message || "Failed to send verification email. Please try again.");
-            }
-        } finally {
-            setResendLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F6F6F6] to-white p-[20px]">
             <div className="bg-white p-[40px] rounded-[24px] shadow-lg max-w-[500px] w-full">
-                <div className="flex flex-col items-center gap-[24px]">
+                <div className="flex flex-col items-center gap-[24px] text-center">
                     {/* Icon based on status */}
                     {status === 'verifying' && (
                         <div className="relative w-[80px] h-[80px]">
@@ -142,32 +103,12 @@ function VerifyEmailContent() {
                         </div>
                     )}
 
-                    {status === 'missing' && (
-                        <div className="relative w-[80px] h-[80px] flex items-center justify-center">
-                            <div className="absolute inset-0 bg-[#B7B7B7] rounded-full opacity-20"></div>
-                            <svg 
-                                className="w-[80px] h-[80px] text-[#B7B7B7]" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                            >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth={2} 
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
-                                />
-                            </svg>
-                        </div>
-                    )}
-
                     {/* Title */}
-                    <div className="text-center">
-                        <h1 className="text-[#0E0E0E] text-[28px] font-[700] mb-[12px]">
-                            {status === 'verifying' && 'Verifying Email'}
-                            {status === 'success' && 'Email Verified!'}
-                            {status === 'error' && 'Verification Failed'}
-                            {status === 'missing' && 'Invalid Link'}
+                    <div className="flex flex-col gap-[12px]">
+                        <h1 className="text-[#0E0E0E] text-[28px] font-[700]">
+                            {status === 'verifying' && 'Verifying Payment'}
+                            {status === 'success' && 'Payment Successful!'}
+                            {status === 'error' && 'Payment Failed'}
                         </h1>
                         <p className="text-[#0E0E0E] text-[16px] font-[400] leading-[24px]">
                             {message}
@@ -178,45 +119,22 @@ function VerifyEmailContent() {
                     {status === 'success' && (
                         <div className="text-center">
                             <p className="text-[#B7B7B7] text-[14px]">
-                                Redirecting in <span className="font-[700] text-[#E84C88]">{countdown}</span> seconds...
+                                Redirecting to icons in <span className="font-[700] text-[#E84C88]">{countdown}</span> seconds...
                             </p>
                         </div>
                     )}
 
-                    {/* Action buttons for error/missing states */}
-                    {(status === 'error' || status === 'missing') && (
+                    {/* Action buttons for error state */}
+                    {status === 'error' && (
                         <div className="flex flex-col gap-[12px] w-full mt-[12px]">
-                            {/* Resend verification button (only for error, not missing) */}
-                            {status === 'error' && (
-                                <>
-                                    <button 
-                                        onClick={handleResendVerification}
-                                        disabled={resendLoading}
-                                        className="w-full h-[48px] bg-[#7AE684] text-[#2D6332] font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#6bd674] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {resendLoading ? "Sending..." : "Resend Verification Email"}
-                                    </button>
-                                    
-                                    {resendMessage && (
-                                        <div className={`p-3 rounded-lg text-[12px] text-center ${
-                                            resendMessage.includes('sent') || resendMessage.includes('success')
-                                                ? "bg-green-100 text-green-700" 
-                                                : "bg-red-100 text-red-700"
-                                        }`}>
-                                            {resendMessage}
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                            
-                            <Link href="/auth/signin">
+                            <Link href="/pricing">
                                 <button className="w-full h-[48px] bg-[#E84C88] text-white font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#d43d75] transition-colors">
-                                    Go to Sign In
+                                    Try Again
                                 </button>
                             </Link>
-                            <Link href="/auth/signup">
+                            <Link href="/icons">
                                 <button className="w-full h-[48px] bg-[#F6F6F6] text-[#0E0E0E] font-[600] text-[14px] leading-[20px] rounded-full hover:bg-[#e5e5e5] transition-colors">
-                                    Create New Account
+                                    Go to Icons
                                 </button>
                             </Link>
                         </div>
@@ -249,14 +167,12 @@ function VerifyEmailContent() {
                                 <h3 className="text-[#0E0E0E] text-[14px] font-[600]">
                                     {status === 'success' && 'What\'s Next?'}
                                     {status === 'error' && 'Need Help?'}
-                                    {status === 'missing' && 'About Verification'}
                                     {status === 'verifying' && 'Please Wait'}
                                 </h3>
                                 <p className="text-[#0E0E0E] text-[12px] font-[400] leading-[18px]">
-                                    {status === 'success' && 'Your account is now verified. You can now access all features and start using Figcons!'}
-                                    {status === 'error' && 'If you continue to have issues, please request a new verification email from your profile settings.'}
-                                    {status === 'missing' && 'Verification links are sent to your email when you register. Please check your inbox and spam folder.'}
-                                    {status === 'verifying' && 'We\'re verifying your email address. This usually takes just a few seconds.'}
+                                    {status === 'success' && 'You now have access to all premium icons and features. Start exploring the full library!'}
+                                    {status === 'error' && 'If you were charged but see this error, please contact support with your payment details.'}
+                                    {status === 'verifying' && 'We\'re confirming your payment with our payment provider. This usually takes just a few seconds.'}
                                 </p>
                             </div>
                         </div>
@@ -267,14 +183,14 @@ function VerifyEmailContent() {
     );
 }
 
-export default function VerifyEmailPage() {
+export default function PaymentSuccessPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
             </div>
         }>
-            <VerifyEmailContent />
+            <PaymentSuccessContent />
         </Suspense>
     );
 }

@@ -1,32 +1,7 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useRef, useState } from 'react';
 
 export default function IconShowcase() {
-    const showcaseRef = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        const currentRef = showcaseRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
-
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
-    }, []);
     const Cards = [
         {
             title: "The encyclopedia of icons",
@@ -58,31 +33,43 @@ export default function IconShowcase() {
             description: "Explore special collections for unique vibes and use cases.",
             image: "/IconShowcase6.svg",
         },
-    ]
+    ];
+
     return (
-        <div ref={showcaseRef} className="flex flex-col justify-center items-center gap-[32px]">
-            <div className={`md:w-[568px] w-[100%] flex flex-col gap-[12px] justify-center items-center text-center transition-all duration-600 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-            }`}>
-                <h1 className="text-[#0e0e0e] text-[20px] md:text-[30px] font-bold leading-[32px] md:leading-[40px]">Everything You Need to Design Smarter</h1>
-                <p className="text-[#454545] text-[14px] md:text-[16px] font-normal leading-[20px] md:leading-[24px]">From clean minimal sets to playful creative styles, everything is crafted to fit perfectly into websites, apps, and brand projects.</p>
+        <div className="flex flex-col justify-center items-center gap-[32px]">
+            <div className="md:w-[568px] w-[100%] flex flex-col gap-[12px] justify-center items-center text-center">
+                <h1 className="text-[#0e0e0e] text-[20px] md:text-[30px] font-bold leading-[32px] md:leading-[40px]">
+                    Everything You Need to Design Smarter
+                </h1>
+                <p className="text-[#454545] text-[14px] md:text-[16px] font-normal leading-[20px] md:leading-[24px]">
+                    From clean minimal sets to playful creative styles, everything is crafted to fit perfectly into websites, apps, and brand projects.
+                </p>
             </div>
-            <div className={`grid gap-[36px] md:gap-[0px] grid-cols-1 md:grid-cols-3 transition-all duration-600 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-            }`} style={{ transitionDelay: isVisible ? '150ms' : '0ms' }}>
+
+            <div className="grid gap-[36px] md:gap-[0px] grid-cols-1 md:grid-cols-3">
                 {Cards.map((card, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className="flex flex-col gap-[16px] md:gap-[32px] md:px-[24px] px-[0px] pb-[0px] md:pb-[32px]"
                     >
-                        <Image src={card.image} width={999999} height={999999} className="w-[100%] 2xl:h-[408px] md:h-[350px] h-[408px] object-contain md:object-cover rounded-[24px] pointer-events-none" alt="" />
+                        <Image
+                            src={card.image}
+                            width={999999}
+                            height={999999}
+                            className="w-[100%] 2xl:h-[408px] md:h-[350px] h-[408px] object-contain md:object-cover rounded-[24px] pointer-events-none"
+                            alt={card.title}
+                        />
                         <div className="flex flex-col justify-start items-start gap-[8px]">
-                            <h1 className="text-[#0e0e0e] text-[20px] font-bold leading-[32px]">{card.title}</h1>
-                            <p className="text-[#454545] text-[12px] font-normal leading-[20px]">{card.description}</p>
+                            <h1 className="text-[#0e0e0e] text-[20px] font-bold leading-[32px]">
+                                {card.title}
+                            </h1>
+                            <p className="text-[#454545] text-[12px] font-normal leading-[20px]">
+                                {card.description}
+                            </p>
                         </div>
                     </div>
                 ))}
             </div>
         </div>
-    )
+    );
 }

@@ -1,5 +1,7 @@
 // Base API URL
-export const API_BASE_URL = "http://localhost:5000";
+// export const API_BASE_URL = "http://localhost:5000";
+export const API_BASE_URL = "https://figcons-backend.vercel.app";
+
 
 // API Endpoints
 const endpoints = {

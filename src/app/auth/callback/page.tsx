@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setAuthToken } from "@/commons/Api";
+import GuestRoute from "@/components/GuestRoute";
 
 function CallbackContent() {
     const router = useRouter();
@@ -103,12 +104,14 @@ function CallbackContent() {
 
 export default function CallbackPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
-            </div>
-        }>
-            <CallbackContent />
-        </Suspense>
+        <GuestRoute>
+            <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
+                </div>
+            }>
+                <CallbackContent />
+            </Suspense>
+        </GuestRoute>
     );
 }

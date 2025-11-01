@@ -6,8 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { seatAPI, userAPI } from "@/commons/Api";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function Profile() {
+function Profile() {
     const [isNotificationOn, setIsNotificationOn] = useState(true);
     const [activeSection, setActiveSection] = useState("profile-details");
 
@@ -1125,12 +1126,6 @@ export default function Profile() {
                         </svg>
                     </div>
                 </div>
-                {/* logout section */}
-                <div className="w-[100%]">
-                    <button className="w-[100%] h-[48px] bg-[#f6f6f6] text-[#0E0E0E] font-[700] rounded-[12px] text-[14px] leading-[20px]">
-                        Log Out
-                    </button>
-                </div>
                 {/* delete account section */}
                 <div id="delete-account" className="w-[100%] flex flex-col gap-[12px]">
                     <h1 className="text-[#0E0E0E] font-[700] text-[18px] leading-[32px]">Delete Account</h1>
@@ -1142,4 +1137,12 @@ export default function Profile() {
         </div>
         <Footer />
     </>;
+}
+
+export default function ProfilePage() {
+    return (
+        <ProtectedRoute>
+            <Profile />
+        </ProtectedRoute>
+    );
 }

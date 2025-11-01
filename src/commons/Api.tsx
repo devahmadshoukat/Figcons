@@ -232,10 +232,12 @@ export const iconsAPI = {
         return apiRequest(url, { method: 'GET' });
     },
 
-    // Get organized icons by category
+    // Get organized icons by category with pagination
     getOrganized: async (params?: {
         isPublic?: boolean;
         isPremium?: boolean;
+        page?: number;
+        limit?: number;
     }) => {
         const queryParams = new URLSearchParams();
         if (params) {

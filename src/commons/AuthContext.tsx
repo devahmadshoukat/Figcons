@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { BACKEND_URL } from "@/commons/Api";
+import { API_BASE_URL } from "@/commons/Api";
 
 interface User {
     id: string;
@@ -164,7 +164,7 @@ export const authUtils = {
     async upgradeToPremium(): Promise<boolean> {
         try {
             const response = await this.apiRequest(
-                `${process.env.NEXT_PUBLIC_API_URL || BACKEND_URL}/api/auth/upgrade-premium`,
+                `${API_BASE_URL}/api/auth/upgrade-premium`,
                 { method: 'POST' }
             );
 

@@ -1,6 +1,29 @@
+"use client";
 import Svg from "@/commons/Svg";
+import { useEffect, useState } from "react";
 
-export default function Filters() {
+interface FiltersProps {
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+}
+
+export default function Filters({ searchQuery, setSearchQuery }: FiltersProps) {
+    const [localSearch, setLocalSearch] = useState<string>(searchQuery);
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchQuery(localSearch);
+        }, 500); // 500ms debounce
+
+        return () => clearTimeout(timer);
+    }, [localSearch, setSearchQuery]);
+
+    // Sync local search with prop when it changes externally
+    useEffect(() => {
+        setLocalSearch(searchQuery);
+    }, [searchQuery]);
+
     return (
         <div className="w-[100%] border-t border-[#ececec] py-[24px]">
             <div className="flex md:flex-row flex-col justify-start items-start md:justify-between gap-[20px] items-center md:px-[40px] px-[16px]">
@@ -28,7 +51,13 @@ export default function Filters() {
                 </div>
                 <div className="bg-[#f6f6f6] px-[12px] py-[8px] w-[100%] md:w-[400px] h-[48px] rounded-full flex gap-[8px] items-center">
                     <Svg icon="search" />
-                    <input className="w-[100%] outline-none bg-transparent text-[12px] md:text-[14px] text-[#000000] placeholder:text-[#b7b7b7]" type="text" placeholder="Search 40,000+ icons..." />
+                    <input 
+                        className="w-[100%] outline-none bg-transparent text-[12px] md:text-[14px] text-[#000000] placeholder:text-[#b7b7b7]" 
+                        type="text" 
+                        placeholder="Search 40,000+ icons..." 
+                        value={localSearch}
+                        onChange={(e) => setLocalSearch(e.target.value)}
+                    />
                 </div>
             </div>
         </div>

@@ -97,6 +97,7 @@ export default function Pricing() {
     const [error, setError] = useState<string>("");
     const [userSubscription, setUserSubscription] = useState<any>(null);
     const [isLoadingUser, setIsLoadingUser] = useState(true);
+    const [isUsingSharedSeat, setIsUsingSharedSeat] = useState(false);
 
     // Fetch user subscription status
     useEffect(() => {
@@ -111,6 +112,18 @@ export default function Pricing() {
                 const response = await paymentAPI.getSubscriptionStatus();
                 if (response.success && response.user) {
                     setUserSubscription(response.user.subscription);
+                    
+                    // Check if user is using a shared seat (assigned by someone else)
+                    const subscription = response.user.subscription;
+                    if (subscription?.assignedBy && subscription?.assignedByEmail) {
+                        setIsUsingSharedSeat(true);
+                        
+                        // Set default selection to 5 seats for shared users (1 seat is disabled)
+                        setSelectedSeats({
+                            Pro: "5 Seats",
+                            "Pro Plus": "5 Seats",
+                        });
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching subscription:", err);
@@ -225,6 +238,28 @@ export default function Pricing() {
                         40,000+ icons, 32,000+ premium illustrations for designers and developers
                     </p>
                     
+                    {/* Shared Seat Notice */}
+                    {isUsingSharedSeat && (
+                        <div className="w-full max-w-[800px] bg-gradient-to-r from-[#E84C88] to-[#d43d75] text-white px-[24px] py-[16px] rounded-[16px] shadow-lg">
+                            <div className="flex items-center gap-[12px]">
+                                <svg className="w-[24px] h-[24px] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                                <div className="flex flex-col items-start text-left">
+                                    <h3 className="text-[16px] font-[700] leading-[24px]">
+                                        🎉 You're using a shared seat!
+                                    </h3>
+                                    <p className="text-[13px] font-[400] leading-[20px] opacity-90">
+                                        Shared by: <span className="font-[600]">{userSubscription?.assignedByEmail}</span>
+                                    </p>
+                                    <p className="text-[12px] font-[400] leading-[18px] opacity-80 mt-[4px]">
+                                        Want your own plan? Choose 5 or 25 seats below. You'll automatically leave this shared seat when you purchase.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     {/* Error Message */}
                     {error && (
                         <div className="bg-red-100 text-red-700 px-[20px] py-[12px] rounded-full text-[14px] font-[500]">
@@ -307,27 +342,53 @@ export default function Pricing() {
                                                     const isCurrentSeat = currentSeats === seatCount;
                                                     const isSeatUpgrade = currentSeats && seatCount > currentSeats;
                                                     
+                                                    // Disable 1-seat option for users with shared seats
+                                                    const isDisabledForSharedUser = isUsingSharedSeat && seatCount === 1;
+                                                    
                                                     return (
                                                         <button
                                                             key={idx}
-                                                            onClick={() => handleSeatChange(plan.name, seat)}
-                                                            disabled={isLoading || isCurrentSeat}
+                                                            onClick={() => !isDisabledForSharedUser && handleSeatChange(plan.name, seat)}
+                                                            disabled={isLoading || isCurrentSeat || isDisabledForSharedUser}
                                                             className={`w-full px-[20px] py-[8px] ${
-                                                                selectedSeats[plan.name] === seat
+                                                                selectedSeats[plan.name] === seat && !isDisabledForSharedUser
                                                                     ? "bg-[#E84C88] text-white"
                                                                     : isCurrentSeat
                                                                     ? "bg-[#0e0e0e] text-white cursor-not-allowed"
+                                                                    : isDisabledForSharedUser
+                                                                    ? "bg-[#f5f5f5] text-[#b7b7b7] cursor-not-allowed opacity-50"
                                                                     : "bg-[#ECECEC] text-[#0e0e0e] hover:bg-[#d9d9d9]"
                                                             } text-[16px] font-bold leading-[24px] rounded-full flex flex-col items-center justify-center h-[56px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative`}
+                                                            title={isDisabledForSharedUser ? "1-seat plan not available for shared seat users" : ""}
                                                         >
                                                             <span>{seat}</span>
-                                                            {isSeatUpgrade && (
+                                                            {isDisabledForSharedUser && (
+                                                                <span className="text-[10px] font-[400]">Not available</span>
+                                                            )}
+                                                            {isSeatUpgrade && !isDisabledForSharedUser && (
                                                                 <span className="text-[10px] font-[400]">+{seatCount - currentSeats} more</span>
                                                             )}
                                                         </button>
                                                     );
                                                 })}
                                             </div>
+                                            
+                                            {/* Info box for shared seat users */}
+                                            {isUsingSharedSeat && plan.seats.length > 0 && (
+                                                <div className="w-full bg-[#FFF3F8] border border-[#E84C88] rounded-[12px] p-[16px]">
+                                                    <div className="flex gap-[12px] items-start">
+                                                        <span className="text-[18px]">💡</span>
+                                                        <div className="flex flex-col gap-[4px]">
+                                                            <p className="text-[#0e0e0e] text-[12px] font-[600]">
+                                                                For Shared Seat Users
+                                                            </p>
+                                                            <p className="text-[#0e0e0e] text-[11px] font-[400] leading-[16px]">
+                                                                Single seat plans are not available. Choose 5 or 25 seats to get your own subscription and automatically leave the shared seat.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 

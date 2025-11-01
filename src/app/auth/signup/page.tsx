@@ -6,6 +6,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Input, { LinkAccount } from "@/commons/Input";
 import { authAPI, seatAPI, setAuthToken } from "@/commons/Api";
+import GuestRoute from "@/components/GuestRoute";
 
 function SignupForm() {
     const router = useRouter();
@@ -383,12 +384,14 @@ function SignupForm() {
 
 export default function Page() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
-            </div>
-        }>
-            <SignupForm />
-        </Suspense>
+        <GuestRoute>
+            <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
+                </div>
+            }>
+                <SignupForm />
+            </Suspense>
+        </GuestRoute>
     );
 }

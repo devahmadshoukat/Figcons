@@ -3,6 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authAPI, setAuthToken } from "@/commons/Api";
 import Link from "next/link";
+import GuestRoute from "@/components/GuestRoute";
 
 function VerifyEmailContent() {
     const router = useRouter();
@@ -269,12 +270,14 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
-            </div>
-        }>
-            <VerifyEmailContent />
-        </Suspense>
+        <GuestRoute>
+            <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-[#b7b7b7] text-[14px]">Loading...</div>
+                </div>
+            }>
+                <VerifyEmailContent />
+            </Suspense>
+        </GuestRoute>
     );
 }

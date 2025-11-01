@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Input, { LinkAccount } from "@/commons/Input";
-import { authAPI, setAuthToken } from "@/commons/Api";
+import { API_BASE_URL, authAPI, setAuthToken } from "@/commons/Api";
+import GuestRoute from "@/components/GuestRoute";
 
-export default function Page() {
+function SignInPage() {
     const router = useRouter();
     const [formData, setFormData] = useState({
         email: "",
@@ -19,6 +20,8 @@ export default function Page() {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
+    const [needsEmailVerification, setNeedsEmailVerification] = useState(false);
+    const [resendingEmail, setResendingEmail] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -62,6 +65,7 @@ export default function Page() {
 
         setLoading(true);
         setMessage({ type: "", text: "" });
+        setNeedsEmailVerification(false);
 
         try {
             const response = await authAPI.login({
@@ -85,12 +89,56 @@ export default function Page() {
                 }, 1000);
             }
         } catch (error: any) {
-            setMessage({ 
-                type: "error", 
-                text: error.message || "Login failed. Please check your credentials." 
-            });
+            // Check if error is due to unverified email
+            if (error.message && error.message.includes("verify your email")) {
+                setNeedsEmailVerification(true);
+                setMessage({ 
+                    type: "warning", 
+                    text: error.message 
+                });
+            } else {
+                setMessage({ 
+                    type: "error", 
+                    text: error.message || "Login failed. Please check your credentials." 
+                });
+            }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResendVerification = async () => {
+        setResendingEmail(true);
+        setMessage({ type: "", text: "" });
+
+        try {
+            // First login to get token (will fail but needed for resend endpoint)
+            // Or we can call the resend endpoint that doesn't require auth
+            const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification-public`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: formData.email })
+            });
+
+            const data = await response.json();
+
+            if (data.success || response.ok) {
+                setMessage({ 
+                    type: "success", 
+                    text: "Verification email sent! Please check your inbox." 
+                });
+            } else {
+                throw new Error(data.message || "Failed to send verification email");
+            }
+        } catch (error: any) {
+            setMessage({ 
+                type: "error", 
+                text: error.message || "Failed to send verification email. Please try again." 
+            });
+        } finally {
+            setResendingEmail(false);
         }
     };
 
@@ -152,10 +200,24 @@ export default function Page() {
                             <div className={`p-3 rounded-lg text-[14px] font-[500] text-center ${
                                 message.type === "success" 
                                     ? "bg-green-100 text-green-700" 
+                                    : message.type === "warning"
+                                    ? "bg-yellow-100 text-yellow-700"
                                     : "bg-red-100 text-red-700"
                             }`}>
                                 {message.text}
                             </div>
+                        )}
+
+                        {/* Resend Verification Button */}
+                        {needsEmailVerification && (
+                            <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resendingEmail}
+                                className="w-full h-[48px] bg-[#7AE684] text-[#2D6332] font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#6bd674] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {resendingEmail ? "Sending..." : "📧 Resend Verification Email"}
+                            </button>
                         )}
 
                         {/* BUTTONS */}
@@ -194,5 +256,13 @@ export default function Page() {
                 dangerouslySetInnerHTML={{ __html: assets.circleClose }}
             />
         </div>
+    );
+}
+
+export default function Page() {
+    return (
+        <GuestRoute>
+            <SignInPage />
+        </GuestRoute>
     );
 }

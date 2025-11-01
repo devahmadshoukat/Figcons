@@ -1,7 +1,7 @@
 "use client";
 import IconsEditor from "@/app/icons/IconsEditor";
 import { useRef, useState, useEffect, useCallback } from "react";
-import { iconsAPI } from "@/commons/Api";
+import { iconsAPI, paymentAPI } from "@/commons/Api";
 
 interface Icon {
     _id: string;
@@ -88,9 +88,40 @@ export default function IconsCanvas({ searchQuery = "" }: IconsCanvasProps) {
     const [totalIcons, setTotalIcons] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [userIsPremium, setUserIsPremium] = useState<boolean>(false);
 
     const mainContentRef = useRef<HTMLDivElement>(null);
     const loadMoreRef = useRef<HTMLDivElement>(null);
+
+    // Fetch user premium status
+    useEffect(() => {
+        const fetchUserPremiumStatus = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    setUserIsPremium(false);
+                    return;
+                }
+
+                const response = await paymentAPI.getSubscriptionStatus();
+                if (response.success && response.user) {
+                    // Check if user has premium subscription (isPremium or active subscription)
+                    const subscription = response.user.subscription;
+                    const isPremium = response.user.isPremium || 
+                                     (subscription && subscription.status === 'active') ||
+                                     (subscription && subscription.type === 'lifetime');
+                    setUserIsPremium(isPremium);
+                } else {
+                    setUserIsPremium(false);
+                }
+            } catch (error) {
+                console.error('Error fetching premium status:', error);
+                setUserIsPremium(false);
+            }
+        };
+
+        fetchUserPremiumStatus();
+    }, []);
 
     // Search icons
     const searchIcons = useCallback(async (query: string) => {
@@ -358,8 +389,8 @@ export default function IconsCanvas({ searchQuery = "" }: IconsCanvasProps) {
                                                 onClick={() => handleIconClick(icon)}
                                                 onContextMenu={(e) => e.preventDefault()}
                                             >
-                                                {/* Show PRO badge if isPremium is true */}
-                                                {icon.isPremium && (
+                                                {/* Show PRO badge if icon is premium AND user is NOT premium */}
+                                                {icon.isPremium && !userIsPremium && (
                                                     <div className="absolute -top-[10px] bg-[#7AE684] h-[18px] text-[#2D6332] text-[8px] font-extrabold px-[8px] py-[4px] rounded-full">
                                                         PRO
                                                     </div>

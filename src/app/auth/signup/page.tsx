@@ -13,7 +13,7 @@ function SignupForm() {
     const searchParams = useSearchParams();
     const inviteToken = searchParams.get('inviteToken');
     const invitedEmail = searchParams.get('email');
-    
+
     const [formData, setFormData] = useState({
         name: "",
         email: invitedEmail || "",
@@ -98,85 +98,85 @@ function SignupForm() {
         return isValid;
     };
 
-        const handleSubmit = async (e: React.FormEvent) => {
-            e.preventDefault();
-            
-            if (!validateForm()) return;
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-            setLoading(true);
-            setMessage({ type: "", text: "" });
+        if (!validateForm()) return;
 
-            try {
-                const response = await authAPI.register({
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                });
+        setLoading(true);
+        setMessage({ type: "", text: "" });
 
-                if (response.success) {
-                    // If user registered via invitation, handle automatic acceptance
-                    if (hasInvitation && inviteToken) {
-                        try {
-                            // Login the user first
-                            const loginResponse = await authAPI.login({
-                                email: formData.email,
-                                password: formData.password,
-                            });
+        try {
+            const response = await authAPI.register({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+            });
 
-                            if (loginResponse.success && loginResponse.token) {
-                                setAuthToken(loginResponse.token);
-                                
-                                // Find the invitation by token
-                                const statusResponse = await seatAPI.getStatus();
-                                const invitation = statusResponse.receivedInvitations?.find(
-                                    (inv: any) => inv.invitationToken === inviteToken && inv.status === 'pending'
-                                );
+            if (response.success) {
+                // If user registered via invitation, handle automatic acceptance
+                if (hasInvitation && inviteToken) {
+                    try {
+                        // Login the user first
+                        const loginResponse = await authAPI.login({
+                            email: formData.email,
+                            password: formData.password,
+                        });
 
-                                if (invitation) {
-                                    // Accept the invitation
-                                    const acceptResponse = await seatAPI.accept(invitation._id);
-                                    
-                                    if (acceptResponse.success) {
-                                        // Show success message and redirect to home
-                                        setMessage({ 
-                                            type: "success", 
-                                            text: "Account created and premium access activated! Redirecting..." 
-                                        });
-                                        
-                                        setTimeout(() => {
-                                            router.push('/');
-                                        }, 2000);
-                                        return;
-                                    }
+                        if (loginResponse.success && loginResponse.token) {
+                            setAuthToken(loginResponse.token);
+
+                            // Find the invitation by token
+                            const statusResponse = await seatAPI.getStatus();
+                            const invitation = statusResponse.receivedInvitations?.find(
+                                (inv: any) => inv.invitationToken === inviteToken && inv.status === 'pending'
+                            );
+
+                            if (invitation) {
+                                // Accept the invitation
+                                const acceptResponse = await seatAPI.accept(invitation._id);
+
+                                if (acceptResponse.success) {
+                                    // Show success message and redirect to home
+                                    setMessage({
+                                        type: "success",
+                                        text: "Account created and premium access activated! Redirecting..."
+                                    });
+
+                                    setTimeout(() => {
+                                        router.push('/');
+                                    }, 2000);
+                                    return;
                                 }
                             }
-                        } catch (inviteError) {
-                            console.error('Failed to auto-accept invitation:', inviteError);
-                            // Continue with normal flow if invitation acceptance fails
                         }
+                    } catch (inviteError) {
+                        console.error('Failed to auto-accept invitation:', inviteError);
+                        // Continue with normal flow if invitation acceptance fails
                     }
-                    
-                    // Normal flow: Store email and show modal
-                    setRegisteredEmail(formData.email);
-                    setShowEmailModal(true);
-                    
-                    // Clear form
-                    setFormData({
-                        name: "",
-                        email: "",
-                        password: "",
-                        confirmPassword: "",
-                    });
                 }
-            } catch (error: any) {
-                setMessage({ 
-                    type: "error", 
-                    text: error.message || "Registration failed. Please try again." 
+
+                // Normal flow: Store email and show modal
+                setRegisteredEmail(formData.email);
+                setShowEmailModal(true);
+
+                // Clear form
+                setFormData({
+                    name: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
                 });
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (error: any) {
+            setMessage({
+                type: "error",
+                text: error.message || "Registration failed. Please try again."
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="p-[20px] flex">
@@ -210,7 +210,7 @@ function SignupForm() {
                     <h1 className="text-[#0E0E0E] font-[700] text-[30px] leading-[40px]">
                         Create new account
                     </h1>
-                    
+
                     {/* Invitation Banner */}
                     {hasInvitation && (
                         <div className="bg-gradient-to-r from-[#E84C88]/20 to-[#7AE684]/20 border-2 border-[#E84C88] rounded-[16px] p-[16px] max-w-[400px]">
@@ -231,16 +231,16 @@ function SignupForm() {
 
                 <form onSubmit={handleSubmit} className="w-[100%] md:w-[400px] flex flex-col gap-[24px]">
                     <div className="flex flex-col gap-[24px]">
-                        <Input 
-                            label="Full name*" 
+                        <Input
+                            label="Full name*"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
                             placeholder="Enter your full name"
                             error={errors.name}
                         />
-                        <Input 
-                            label="Email*" 
+                        <Input
+                            label="Email*"
                             type="email"
                             name="email"
                             value={formData.email}
@@ -249,8 +249,8 @@ function SignupForm() {
                             error={errors.email}
                             disabled={hasInvitation}
                         />
-                        <Input 
-                            label="Password*" 
+                        <Input
+                            label="Password*"
                             type="password"
                             name="password"
                             value={formData.password}
@@ -258,8 +258,8 @@ function SignupForm() {
                             placeholder="Enter your password"
                             error={errors.password}
                         />
-                        <Input 
-                            label="Confirm Password*" 
+                        <Input
+                            label="Confirm Password*"
                             type="password"
                             name="confirmPassword"
                             value={formData.confirmPassword}
@@ -270,18 +270,17 @@ function SignupForm() {
 
                         {/* Message */}
                         {message.text && (
-                            <div className={`p-3 rounded-lg text-[14px] font-[500] text-center ${
-                                message.type === "success" 
-                                    ? "bg-green-100 text-green-700" 
+                            <div className={`p-3 rounded-lg text-[14px] font-[500] text-center ${message.type === "success"
+                                    ? "bg-green-100 text-green-700"
                                     : "bg-red-100 text-red-700"
-                            }`}>
+                                }`}>
                                 {message.text}
                             </div>
                         )}
 
                         {/* BUTTONS */}
                         <div className="flex flex-col gap-[12px] items-center">
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={loading}
                                 className="w-full h-[48px] bg-[#E84C88] text-white font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#d43d75] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -310,77 +309,79 @@ function SignupForm() {
                 </form>
             </div>
 
+            <Link href="/">
                 <div
                     className="fixed top-[25px] md:top-[56px] right-[25px] md:right-[56px] cursor-pointer"
                     dangerouslySetInnerHTML={{ __html: assets.circleClose }}
                 />
+            </Link>
 
-                {/* Email Verification Modal */}
-                {showEmailModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000080] backdrop-blur-sm p-[20px] animate-in fade-in duration-300">
-                        <div className="bg-white rounded-[24px] p-[40px] max-w-[500px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
-                            <div className="flex flex-col items-center gap-[24px] text-center">
-                                {/* Email Icon */}
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-[#E84C88] rounded-full opacity-20 animate-ping"></div>
-                                    <div className="relative bg-[#E84C88] rounded-full p-[20px]">
-                                        <svg 
-                                            className="w-[48px] h-[48px] text-white" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round" 
-                                                strokeWidth={2} 
-                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                {/* Title */}
-                                <div className="flex flex-col gap-[12px]">
-                                    <h2 className="text-[#0E0E0E] text-[28px] font-[700]">
-                                        Check Your Email
-                                    </h2>
-                                    <p className="text-[#0E0E0E] text-[16px] font-[400] leading-[24px]">
-                                        We've sent a verification link to:
-                                    </p>
-                                    <p className="text-[#E84C88] text-[16px] font-[600] break-all">
-                                        {registeredEmail}
-                                    </p>
-                                </div>
-
-                                {/* Warning */}
-                                <p className="text-[#6b7280] text-[12px] font-[400]">
-                                    Can't find the email? Check your spam folder or click below to resend.
-                                </p>
-
-                                {/* Action Buttons */}
-                                <div className="flex flex-col gap-[12px] w-full">
-                                    <button 
-                                        onClick={() => setShowEmailModal(false)}
-                                        className="w-full h-[48px] bg-[#E84C88] text-white font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#d43d75] transition-colors"
+            {/* Email Verification Modal */}
+            {showEmailModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000080] backdrop-blur-sm p-[20px] animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[24px] p-[40px] max-w-[500px] w-full shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="flex flex-col items-center gap-[24px] text-center">
+                            {/* Email Icon */}
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-[#E84C88] rounded-full opacity-20 animate-ping"></div>
+                                <div className="relative bg-[#E84C88] rounded-full p-[20px]">
+                                    <svg
+                                        className="w-[48px] h-[48px] text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
                                     >
-                                        Got it!
-                                    </button>
-                                    <Link href="/auth/signin">
-                                        <button 
-                                            className="w-full h-[48px] bg-[#F6F6F6] text-[#0E0E0E] font-[600] text-[14px] leading-[20px] rounded-full hover:bg-[#e5e5e5] transition-colors"
-                                        >
-                                            Go to Sign In
-                                        </button>
-                                    </Link>
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                        />
+                                    </svg>
                                 </div>
+                            </div>
+
+                            {/* Title */}
+                            <div className="flex flex-col gap-[12px]">
+                                <h2 className="text-[#0E0E0E] text-[28px] font-[700]">
+                                    Check Your Email
+                                </h2>
+                                <p className="text-[#0E0E0E] text-[16px] font-[400] leading-[24px]">
+                                    We've sent a verification link to:
+                                </p>
+                                <p className="text-[#E84C88] text-[16px] font-[600] break-all">
+                                    {registeredEmail}
+                                </p>
+                            </div>
+
+                            {/* Warning */}
+                            <p className="text-[#6b7280] text-[12px] font-[400]">
+                                Can't find the email? Check your spam folder or click below to resend.
+                            </p>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-[12px] w-full">
+                                <button
+                                    onClick={() => setShowEmailModal(false)}
+                                    className="w-full h-[48px] bg-[#E84C88] text-white font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#d43d75] transition-colors"
+                                >
+                                    Got it!
+                                </button>
+                                <Link href="/auth/signin">
+                                    <button
+                                        className="w-full h-[48px] bg-[#F6F6F6] text-[#0E0E0E] font-[600] text-[14px] leading-[20px] rounded-full hover:bg-[#e5e5e5] transition-colors"
+                                    >
+                                        Go to Sign In
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
-        );
-    }
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function Page() {
     return (

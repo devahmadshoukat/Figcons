@@ -60,7 +60,7 @@ function SignInPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) return;
 
         setLoading(true);
@@ -76,13 +76,13 @@ function SignInPage() {
             if (response.success) {
                 // Save token
                 setAuthToken(response.token);
-                
+
                 // Show success message
-                setMessage({ 
-                    type: "success", 
-                    text: "Login successful! Redirecting..." 
+                setMessage({
+                    type: "success",
+                    text: "Login successful! Redirecting..."
                 });
-                
+
                 // Redirect to home after 1 second
                 setTimeout(() => {
                     router.push("/");
@@ -92,14 +92,14 @@ function SignInPage() {
             // Check if error is due to unverified email
             if (error.message && error.message.includes("verify your email")) {
                 setNeedsEmailVerification(true);
-                setMessage({ 
-                    type: "warning", 
-                    text: error.message 
+                setMessage({
+                    type: "warning",
+                    text: error.message
                 });
             } else {
-                setMessage({ 
-                    type: "error", 
-                    text: error.message || "Login failed. Please check your credentials." 
+                setMessage({
+                    type: "error",
+                    text: error.message || "Login failed. Please check your credentials."
                 });
             }
         } finally {
@@ -125,17 +125,17 @@ function SignInPage() {
             const data = await response.json();
 
             if (data.success || response.ok) {
-                setMessage({ 
-                    type: "success", 
-                    text: "Verification email sent! Please check your inbox." 
+                setMessage({
+                    type: "success",
+                    text: "Verification email sent! Please check your inbox."
                 });
             } else {
                 throw new Error(data.message || "Failed to send verification email");
             }
         } catch (error: any) {
-            setMessage({ 
-                type: "error", 
-                text: error.message || "Failed to send verification email. Please try again." 
+            setMessage({
+                type: "error",
+                text: error.message || "Failed to send verification email. Please try again."
             });
         } finally {
             setResendingEmail(false);
@@ -176,8 +176,8 @@ function SignInPage() {
 
                 <form onSubmit={handleSubmit} className="w-[100%] md:w-[400px] flex flex-col gap-[24px]">
                     <div className="flex flex-col gap-[24px]">
-                        <Input 
-                            label="Email*" 
+                        <Input
+                            label="Email*"
                             type="email"
                             name="email"
                             value={formData.email}
@@ -185,8 +185,8 @@ function SignInPage() {
                             placeholder="Enter your email"
                             error={errors.email}
                         />
-                        <Input 
-                            label="Password*" 
+                        <Input
+                            label="Password*"
                             type="password"
                             name="password"
                             value={formData.password}
@@ -197,13 +197,12 @@ function SignInPage() {
 
                         {/* Message */}
                         {message.text && (
-                            <div className={`p-3 rounded-lg text-[14px] font-[500] text-center ${
-                                message.type === "success" 
-                                    ? "bg-green-100 text-green-700" 
-                                    : message.type === "warning"
+                            <div className={`p-3 rounded-lg text-[14px] font-[500] text-center ${message.type === "success"
+                                ? "bg-green-100 text-green-700"
+                                : message.type === "warning"
                                     ? "bg-yellow-100 text-yellow-700"
                                     : "bg-red-100 text-red-700"
-                            }`}>
+                                }`}>
                                 {message.text}
                             </div>
                         )}
@@ -222,7 +221,7 @@ function SignInPage() {
 
                         {/* BUTTONS */}
                         <div className="flex flex-col gap-[12px] items-center">
-                            <button 
+                            <button
                                 type="submit"
                                 disabled={loading}
                                 className="w-full h-[48px] bg-[#E84C88] text-white font-[700] text-[14px] leading-[20px] rounded-full hover:bg-[#d43d75] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -250,11 +249,12 @@ function SignInPage() {
                     <LinkAccount />
                 </form>
             </div>
-
-            <div
-                className="fixed top-[25px] md:top-[56px] right-[25px] md:right-[56px] cursor-pointer"
-                dangerouslySetInnerHTML={{ __html: assets.circleClose }}
-            />
+            <Link href="/">
+                <div
+                    className="fixed top-[25px] md:top-[56px] right-[25px] md:right-[56px] cursor-pointer"
+                    dangerouslySetInnerHTML={{ __html: assets.circleClose }}
+                />
+            </Link>
         </div>
     );
 }
